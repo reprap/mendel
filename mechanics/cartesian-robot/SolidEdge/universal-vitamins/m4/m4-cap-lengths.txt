@@ -1,0 +1,28 @@
+AVAILABLE M4 CAP LENGTHS FROM STOCKS IN UK
+
+RS (22-Jun-09):
+
+8
+10
+12
+16
+20
+25
+30
+35
+40
+50
+
+Farnell (22-Jun-09)
+6
+8
+12
+15
+16
+10
+25
+20
+35
+30
+40
+50
