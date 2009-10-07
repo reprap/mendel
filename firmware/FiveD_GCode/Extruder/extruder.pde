@@ -21,7 +21,7 @@ extruder::extruder()
   pinMode(TC_0, OUTPUT); 
   digitalWrite(TC_0,HIGH);  // Disable MAX6675
 #else
-  pinmode(TEMP_PIN, INPUT);
+  pinMode(TEMP_PIN, INPUT);
 #endif
 
   
@@ -84,7 +84,7 @@ void extruder::manage()
 int extruder::internalTemperature()
 {
 #ifdef USE_THERMISTOR
-	int raw = analogRead(TEMP_PIN); //sample_temperature(TEMP_PIN);
+	int raw = analogRead(TEMP_PIN);
 
 	int celsius = raw;
 	byte i;

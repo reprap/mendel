@@ -10,7 +10,7 @@
  This program changes the frequency of Timer 0 so that PWM on pins H1E and H2E goes at
  a very high frequency (64kHz see: 
  http://tzechienchu.typepad.com/tc_chus_point/2009/05/changing-pwm-frequency-on-the-arduino-diecimila.html)
-This will mess up timings in the delay() and similar functions; they will no longer work in
+ This will mess up timings in the delay() and similar functions; they will no longer work in
  milliseconds, but 64 times faster.
  */
   
@@ -38,8 +38,7 @@ void setup()
 
 void loop() 
 { 
-  //if(rs485Interface.available())
-  //    rs485Interface.print(rs485Interface.read(), BYTE); 
+  // Handle RS585
   
   talker.tick();
   

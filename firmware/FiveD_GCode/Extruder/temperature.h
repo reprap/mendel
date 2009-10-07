@@ -2,12 +2,6 @@
 #define TEMPERATURE_H
 
 
-// How many temperature samples to take for an average.  each sample takes about 100 usecs.
-#define TEMPERATURE_SAMPLES 3
-
-// How accurately do we maintain the temperature?
-#define HALF_DEAD_ZONE 5
-
 // Thermistor lookup table for RepRap Temperature Sensor Boards 
 // See this page:  
 // http://dev.www.reprap.org/bin/view/Main/Thermistor
