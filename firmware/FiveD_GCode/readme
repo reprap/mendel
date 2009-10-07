@@ -1,0 +1,11 @@
+For instructions on how to use the RepRap 5D GCode Interpreter and Extruder programs 
+in a RepRap controlled by a Version 1.0 Motherboard or a Sanguino 
+and having directly-controlled extruders, see:
+
+    http://www.reprap.org/bin/view/Main/Generation2Firmware
+  
+For instructions on how to use the RepRap 5D GCode Interpreter and Extruder programs 
+in a RepRap controlled by a Version 1.x (x >= 1) Motherboard or an Arduino Mega 
+and having RS485-controlled extruders, see:
+
+	http://www.reprap.org/bin/view/Main/Generation3Firmware
