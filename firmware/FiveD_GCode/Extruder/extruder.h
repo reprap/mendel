@@ -16,6 +16,13 @@
 #define SPWM 'M'          // Set the motor PWM
 #define PING 'P'          // Just acknowledge
 
+// PID definitions
+
+#define TEMP_PID_INTEGRAL_DRIVE_MAX 110
+#define TEMP_PID_PGAIN 5.0
+#define TEMP_PID_IGAIN 0.1
+#define TEMP_PID_DGAIN 100.0
+
 class extruder
 {
 
@@ -31,12 +38,28 @@ private:
    byte coilPosition;// Stepper position between 0 and 7 inclusive
    byte pwmValue;    // PWM to the motor
    byte stp;         // Tracks the step signal
-   int  temp;        // Target temperature in C
-   int  t;           // Current temperature in C
+   int  targetTemperature;        // Target temperature in C
+   int  currentTemperature;           // Current temperature in C
    int  manageCount; // Timing in the manage function
    bool forward;     // Extrude direction
-   byte blink;       // For the LED
    char reply[REPLY_LENGTH];  // For sending messages back
+   
+#ifdef PID_CONTROL
+
+  volatile int iState; // Integrator state
+  volatile int dState; // Last position input
+  unsigned long previousTime; // ms
+  float pGain;
+  float iGain;
+  float dGain;
+  int temp_dState;
+  long temp_iState;
+  float temp_iState_max;
+  float temp_iState_min;
+
+  byte pidCalculation(int dt);
+
+#endif
 
    void waitForTemperature();
    void slowManage();
@@ -46,6 +69,7 @@ private:
    void setCooler(byte e_speed);
    void setTemperature(int t);
    int getTemperature();
+   void controlTemperature();
    void sStep();
    void enableStep();
    void disableStep();

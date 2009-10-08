@@ -45,7 +45,7 @@
  #define TIMEOUT 3
 #else
  #define rs485Interface Serial
- #define TIMEOUT (64*3)     // 3 ms, but TIMER0 has been messed with in the slave
+ #define TIMEOUT (MILLI_CORRECTION*3)     // 3 ms, but TIMER0 has been messed with in the slave
 #endif
 
 // Communication speed

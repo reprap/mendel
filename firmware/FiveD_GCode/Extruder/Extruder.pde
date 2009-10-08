@@ -29,11 +29,13 @@
 
 extruder ex;
 intercom talker(&ex);
+byte blk;
 
 void setup() 
 {
   pinMode(DEBUG_PIN, OUTPUT);
   rs485Interface.begin(RS485_BAUD);
+  blk = 0;
 } 
 
 void loop() 
@@ -45,6 +47,18 @@ void loop()
   // Keep me at the right temp etc.
   
   ex.manage();
+}
+
+// Blink the LED 
+
+void blink(bool on)
+{
+  if(on)
+  {
+    blk = 1 - blk;
+    digitalWrite(DEBUG_PIN, blk);
+  } else
+    digitalWrite(DEBUG_PIN, 0);
 } 
 
 void delayMicrosecondsInterruptible(unsigned int us)

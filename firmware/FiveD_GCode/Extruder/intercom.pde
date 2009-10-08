@@ -178,6 +178,7 @@ void intercom::tick()
       {
         b = rs485Interface.read();
         resetWait();
+        blink(true);
       } else
       {
         // Have we waited too long for an echo?
@@ -226,6 +227,7 @@ void intercom::tick()
   case RS485_LISTEN:
       if(rs485Interface.available())  // Got anything?
       {
+        blink(true);
         b = rs485Interface.read();
         switch(b)
         {
@@ -265,6 +267,8 @@ void intercom::tick()
         
         if(inPacket && tooLong())
           listenTimeout();
+          
+        blink(false);
       }
       break;
         
