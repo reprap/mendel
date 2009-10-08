@@ -3,7 +3,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#define MY_NAME '0'          // Two byte string representing the name of this device
+#define MY_NAME '0'          // Two byte string  representing the name of this device
 
 #define RS485_MASTER 0       // We are a slave
 
