@@ -63,6 +63,8 @@ extruder::extruder()
 
 #ifdef  PID_CONTROL
 
+// With thanks to Adam at Makerbot and Tim at BotHacker
+// see http://blog.makerbot.com/2009/10/01/open-source-ftw/
 
 byte extruder::pidCalculation(int dt)
 {
@@ -190,25 +192,25 @@ int extruder::internalTemperature()
   digitalWrite(TC_0, 0); // Enable device
 
   /* Cycle the clock for dummy bit 15 */
-  digitalWrite(SCK,HIGH);
-  digitalWrite(SCK,LOW);
+  digitalWrite(SCK,1);
+  digitalWrite(SCK,0);
 
   /* Read bits 14-3 from MAX6675 for the Temp
    	 Loop for each bit reading the value 
    */
   for (int i=11; i>=0; i--)
   {
-    digitalWrite(SCK,HIGH);  // Set Clock to HIGH
+    digitalWrite(SCK,1);  // Set Clock to HIGH
     value += digitalRead(SO) << i;  // Read data and add it to our variable
-    digitalWrite(SCK,LOW);  // Set Clock to LOW
+    digitalWrite(SCK,0);  // Set Clock to LOW
   }
 
   /* Read the TC Input inp to check for TC Errors */
-  digitalWrite(SCK,HIGH); // Set Clock to HIGH
+  digitalWrite(SCK,1); // Set Clock to HIGH
   error_tc = digitalRead(SO); // Read data
-  digitalWrite(SCK,LOW);  // Set Clock to LOW
+  digitalWrite(SCK,0);  // Set Clock to LOW
 
-    digitalWrite(TC_0, HIGH); //Disable Device
+  digitalWrite(TC_0, 1); //Disable Device
 
   if(error_tc)
     return 2000;

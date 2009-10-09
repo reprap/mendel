@@ -25,6 +25,7 @@
 
 #ifdef MENDEL
 
+#if 0
 // define the XYZ parameters of Mendel
 
 #define X_STEPS_PER_MM   10.047
@@ -41,6 +42,26 @@
 #define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
 #define Z_MOTOR_STEPS    400
 #define INVERT_Z_DIR 0
+
+#else
+// parameters for the Bath U. mendel prototype
+#define X_STEPS_PER_MM   13.333333
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
+#define X_MOTOR_STEPS    400
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   13.333333
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
+#define Y_MOTOR_STEPS    400
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   938.64
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
+#define Z_MOTOR_STEPS    400
+#define INVERT_Z_DIR 0
+
+#endif
+
 
 #else
 
@@ -103,7 +124,7 @@
 #define DISABLE_E 0
 
 // Set to one if sensor outputs inverting (ie: 1 means open, 0 means closed)
-// RepRap opto endstop Version 1 is not inverting; Versions 1.0.1 and higher
+// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
 // are inverting
 
 #define ENDSTOPS_INVERTING 1
