@@ -95,7 +95,7 @@ void extruder::controlTemperature()
 {
   currentTemperature = internalTemperature(); 
     
-#ifdef  PID_CONTROL
+#ifdef PID_CONTROL
 
   int dt;
   unsigned long time = millis()/MILLI_CORRECTION;  // Correct for fast clock
@@ -122,7 +122,7 @@ void extruder::slowManage()
 {
   manageCount = 0;
 
-  //blink();  
+  //blink(true);  
 
   controlTemperature();
 }
@@ -181,7 +181,7 @@ int extruder::internalTemperature()
 #endif
 
 #ifdef AD595_THERMOCOUPLE
-  return (int)(((long)500*(long)analogRead(TEMP_PIN))/(long)1024); //( 5.0 * analogRead(TEMP_PIN) * 100.0) / 1024.0;
+  return ( 5.0 * analogRead(TEMP_PIN) * 100.0) / 1024.0; //(int)(((long)500*(long)analogRead(TEMP_PIN))/(long)1024);
 #endif  
 
 #ifdef MAX6675_THERMOCOUPLE
@@ -218,6 +218,7 @@ int extruder::internalTemperature()
     return value/4;
 
 #endif
+
 }
 
 void extruder::waitForTemperature()

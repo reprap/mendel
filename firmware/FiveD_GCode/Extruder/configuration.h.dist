@@ -12,8 +12,8 @@
 // Temperature measurement
 // Uncomment ONE of the next three
 //#define USE_THERMISTOR
-//#define AD595_THERMOCOUPLE
-#define MAX6675_THERMOCOUPLE
+#define AD595_THERMOCOUPLE
+//#define MAX6675_THERMOCOUPLE
 
 // Comment out the next line to give a bang-bang thermostat
 // Leave it for PID temperature control

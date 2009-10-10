@@ -268,7 +268,7 @@ void intercom::tick()
         if(inPacket && tooLong())
           listenTimeout();
           
-        blink(false);
+        //blink(false);
       }
       break;
         
