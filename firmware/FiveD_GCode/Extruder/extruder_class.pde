@@ -54,7 +54,7 @@ extruder::extruder()
 
   coilPosition = 0;  
   forward = true;
-  pwmValue =  130;
+  pwmValue =  STEP_PWM;
   targetTemperature = 0;
   currentTemperature = 0;
   manageCount = 0;
