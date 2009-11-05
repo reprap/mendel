@@ -440,14 +440,15 @@ void process_string(char instruction[], int size)
 			case 107:
 				ex[extruder_in_use]->setCooler(0);
 				break;
-/*
-// Extruder speed is now entirely controlled by E codes
-			//set max extruder speed, 0-255 PWM
+
+			//set PWM to extruder stepper
 			case 108:
 				if (gc.seen & GCODE_S)
-					extruder_speed = gc.S;
+#if MOTHERBOARD > 1
+                                        ex[extruder_in_use]->setPWM(gc.S);
+#endif
 				break;
-*/
+
 
 // The valve (real, or virtual...) is now the way to control any extruder (such as
 // a pressurised paste extruder) that cannot move using E codes.

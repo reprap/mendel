@@ -19,6 +19,11 @@
 // Leave it for PID temperature control
 #define PID_CONTROL
 
+// Uncomment the next line to use full-stepping for the extrude motor
+// Leave it commented for half stepping
+
+//#define FULL_STEP
+
 //******************************************************************************************************
 
 // Divide by this to correct for the fact that we have

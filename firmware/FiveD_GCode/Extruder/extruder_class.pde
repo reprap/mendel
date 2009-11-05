@@ -270,7 +270,11 @@ void extruder::sStep()
   // The pwm = (pwm >> 1) + (pwm >> 3); lines
   // ensure (roughly) equal power on the half-steps
 
-  switch(coilPosition) 
+#ifdef FULL_STEP
+  switch((coilPosition&3) << 1)
+#else
+  switch(coilPosition)
+#endif 
   {
   case 7:
     pwm = (pwm >> 1) + (pwm >> 3);
