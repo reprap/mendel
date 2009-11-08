@@ -443,8 +443,8 @@ void process_string(char instruction[], int size)
 
 			//set PWM to extruder stepper
 			case 108:
-				if (gc.seen & GCODE_S)
 #if MOTHERBOARD > 1
+				if (gc.seen & GCODE_S)
                                         ex[extruder_in_use]->setPWM(gc.S);
 #endif
 				break;

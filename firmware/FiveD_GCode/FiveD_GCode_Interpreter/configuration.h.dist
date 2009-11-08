@@ -25,7 +25,7 @@
 
 #ifdef MENDEL
 
-#if 0
+#if 1
 // define the XYZ parameters of Mendel
 
 #define X_STEPS_PER_MM   10.047
