@@ -445,7 +445,7 @@ void process_string(char instruction[], int size)
 			case 108:
 #if MOTHERBOARD > 1
 				if (gc.seen & GCODE_S)
-                                        ex[extruder_in_use]->setPWM(gc.S);
+                                        ex[extruder_in_use]->setPWM((int)(255.0*gc.S + 0.5));
 #endif
 				break;
 
