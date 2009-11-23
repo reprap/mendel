@@ -23,44 +23,30 @@
 
 #define INCHES_TO_MM 25.4
 
+// The number of mm below which distances are insignificant (one tenth the
+// resolution of the machine is fine).
+
+#define SMALL_DISTANCE 0.01
+
+// Useful to have its square
+
+#define SMALL_DISTANCE2 (SMALL_DISTANCE*SMALL_DISTANCE)
+
 #ifdef MENDEL
 
-#if 1
 // define the XYZ parameters of Mendel
 
 #define X_STEPS_PER_MM   10.047
 #define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
-#define X_MOTOR_STEPS    400
 #define INVERT_X_DIR 0
 
 #define Y_STEPS_PER_MM   10.047
 #define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
-#define Y_MOTOR_STEPS    400
 #define INVERT_Y_DIR 0
 
 #define Z_STEPS_PER_MM   563.877
 #define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
-#define Z_MOTOR_STEPS    400
 #define INVERT_Z_DIR 0
-
-#else
-// parameters for the Bath U. mendel prototype
-#define X_STEPS_PER_MM   13.333333
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
-#define X_MOTOR_STEPS    400
-#define INVERT_X_DIR 0
-
-#define Y_STEPS_PER_MM   13.333333
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
-#define Y_MOTOR_STEPS    400
-#define INVERT_Y_DIR 0
-
-#define Z_STEPS_PER_MM   938.64
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
-#define Z_MOTOR_STEPS    400
-#define INVERT_Z_DIR 0
-
-#endif
 
 
 #else
@@ -69,19 +55,15 @@
 
 #define X_STEPS_PER_MM   7.99735
 #define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
-#define X_MOTOR_STEPS    400
 #define INVERT_X_DIR 0
 
 #define Y_STEPS_PER_MM   7.99735
 #define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
-#define Y_MOTOR_STEPS    400
 #define INVERT_Y_DIR 0
 
 #define Z_STEPS_PER_MM   320
 #define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
-#define Z_MOTOR_STEPS    400
 #define INVERT_Z_DIR 0
-
 
 #endif
 
@@ -92,7 +74,6 @@
 #define E_STEPS_PER_MM   0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
 //#define E_STEPS_PER_MM   2.2       // NEMA 14 geared extruder 8mm diameter drive
 #define E_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM)
-#define E_MOTOR_STEPS    400
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 3000.0
@@ -180,5 +161,23 @@ inline void resetTimer()
 {
   TCNT2 = 0;
 }
+
+#endif
+
+//*************************************************************************
+
+#if 0
+// parameters for the Bath U. mendel prototype
+#define X_STEPS_PER_MM   13.333333
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   13.333333
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   938.64
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
+#define INVERT_Z_DIR 0
 
 #endif

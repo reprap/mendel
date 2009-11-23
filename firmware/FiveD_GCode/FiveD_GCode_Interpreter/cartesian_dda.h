@@ -29,11 +29,11 @@ private:
   LongPoint dda_counter;       // DDA error-accumulation variables
   long t_scale;                // When doing lots of t steps, scale them so the DDA doesn't spend for ever on them
   
-  byte x_direction;            // Am I going in the + or - direction?
-  byte y_direction;
-  byte z_direction;
-  byte e_direction;
-  byte f_direction;
+  bool x_direction;            // Am I going in the + or - direction?
+  bool y_direction;
+  bool z_direction;
+  bool e_direction;
+  bool f_direction;
 
   bool x_can_step;             // Am I not at an endstop?  Have I not reached the target? etc.
   bool y_can_step;
@@ -61,7 +61,7 @@ private:
   
   // Can this axis step?
   
-  bool can_step(byte min_pin, byte max_pin, long current, long target, byte dir);
+  bool can_step(byte min_pin, byte max_pin, long current, long target, bool dir);
   
   // Read a limit switch
   

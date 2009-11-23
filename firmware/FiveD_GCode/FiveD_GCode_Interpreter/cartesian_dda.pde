@@ -4,6 +4,7 @@
 #include "extruder.h"
 #include "vectors.h"
 #include "cartesian_dda.h"
+#include <stdio.h>
 
 
 // Initialise X, Y and Z.  The extruder is initialized
@@ -16,11 +17,11 @@ cartesian_dda::cartesian_dda()
         
   // Default is going forward
   
-        x_direction = 1;
-        y_direction = 1;
-        z_direction = 1;
-        e_direction = 1;
-        f_direction = 1;
+        x_direction = true;
+        y_direction = true;
+        z_direction = true;
+        e_direction = true;
+        f_direction = true;
         
   // Default to the origin and not going anywhere
   
@@ -105,10 +106,10 @@ void cartesian_dda::set_target(const FloatPoint& p)
         FloatPoint squares = delta_position*delta_position;
         distance = squares.x + squares.y + squares.z;
         // If we are 0, only thing changing is e
-        if(distance <= 0.0)
+        if(distance < SMALL_DISTANCE2)
           distance = squares.e;
         // If we are still 0, only thing changing is f
-        if(distance <= 0.0)
+        if(distance < SMALL_DISTANCE2)
           distance = squares.f;
         distance = sqrt(distance);          
                                                                                    			
@@ -135,7 +136,7 @@ void cartesian_dda::set_target(const FloatPoint& p)
         }    
 
 #ifndef ACCELERATION_ON
-        current_steps.f = round(target_position.f);
+        current_steps.f = target_steps.f;
 #endif
 
         delta_steps.f = abs(target_steps.f - current_steps.f);
@@ -161,12 +162,13 @@ void cartesian_dda::set_target(const FloatPoint& p)
         } 
         	
 	//what is our direction?
-
+        
 	x_direction = (target_position.x >= where_i_am.x);
 	y_direction = (target_position.y >= where_i_am.y);
 	z_direction = (target_position.z >= where_i_am.z);
-	e_direction = (target_position.e >= where_i_am.e);
+        e_direction = (target_position.e >= where_i_am.e);
 	f_direction = (target_position.f >= where_i_am.f);
+
 
 	dda_counter.x = -total_steps/2;
 	dda_counter.y = dda_counter.x;
@@ -175,11 +177,11 @@ void cartesian_dda::set_target(const FloatPoint& p)
         dda_counter.f = dda_counter.x;
   
         where_i_am = p;
+
+        //sprintf(debugstring, "%d %d %d", (int)current_steps.e, (int)target_steps.e, (int)delta_steps.e);
         
         return;        
 }
-
-
 
 void cartesian_dda::dda_step()
 {  
@@ -253,6 +255,7 @@ void cartesian_dda::dda_step()
 			
 			if (dda_counter.e > 0)
 			{
+                         
 				do_e_step();
                                 real_move = true;
 				dda_counter.e -= total_steps;
@@ -285,14 +288,15 @@ void cartesian_dda::dda_step()
   
                 if(real_move)
                 {
-                  if(t_scale > 1)
+                  //if(t_scale > 1)
                     timestep = t_scale*current_steps.f;
-                  else
-                    timestep = current_steps.f;
+                  //else
+                    //timestep = current_steps.f;
                   timestep = calculate_feedrate_delay((float) timestep);
                   setTimer(timestep);
                 }
   } while (!real_move && f_can_step);
+  
 
   live = (x_can_step || y_can_step || z_can_step  || e_can_step || f_can_step);
 
@@ -312,46 +316,61 @@ void cartesian_dda::dda_step()
 void cartesian_dda::dda_start()
 {    
   // Set up the DDA
-  //sprintf(debugstring, "%d %d", x_direction, nullmove);
   
   if(nullmove)
     return;
-    
-  	//set our direction pins as well
+
+//set our direction pins as well
+   
+  byte d = 1;
+  	
 #if INVERT_X_DIR == 1
-	digitalWrite(X_DIR_PIN, !x_direction);
+	if(x_direction)
+            d = 0;
 #else
-	digitalWrite(X_DIR_PIN, x_direction);
+	if(!x_direction)
+            d = 0;	
 #endif
-
+        digitalWrite(X_DIR_PIN, d);
+        
+        d = 1;
+    
 #if INVERT_Y_DIR == 1
-	digitalWrite(Y_DIR_PIN, !y_direction);
+	if(y_direction)
+            d = 0;
 #else
-	digitalWrite(Y_DIR_PIN, y_direction);
+	if(!y_direction)
+            d = 0;	
 #endif
-
+        digitalWrite(Y_DIR_PIN, d);
+        
+        d = 1;
+    
 #if INVERT_Z_DIR == 1
-	digitalWrite(Z_DIR_PIN, !z_direction);
+	if(z_direction)
+            d = 0;
 #else
-	digitalWrite(Z_DIR_PIN, z_direction);
+	if(!z_direction)
+            d = 0;	
 #endif
-       if(e_direction)
-         ex[extruder_in_use]->setDirection(1);
-       else
-         ex[extruder_in_use]->setDirection(0);
+        digitalWrite(Z_DIR_PIN, d);
+
+
+       //if(e_direction)
+         ex[extruder_in_use]->setDirection(e_direction);
+       //else
+         //ex[extruder_in_use]->setDirection(false);
   
     //turn on steppers to start moving =)
     
 	enable_steppers();
-        
-       // extcount = 0;
 
         setTimer(DEFAULT_TICK);
 	live = true;
 }
 
 
-bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long target, byte dir)
+bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long target, bool dir)
 {
 
   //stop us if we're on target
@@ -361,22 +380,22 @@ bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long targ
 
 #if ENDSTOPS_MIN_ENABLED == 1
 
-  //stop us if we're home and still going
+  //stop us if we're home and still going lower
   
-	else if(min_pin >= 0)
+	if(min_pin >= 0 && !dir)
         {
-          if (read_switch(min_pin) && !dir)
+          if (read_switch(min_pin) )
 		return false;
         }
 #endif
 
 #if ENDSTOPS_MAX_ENABLED == 1
 
-  //stop us if we're at max and still going
+  //stop us if we're at max and still going higher
   
-	else if(max_pin >= 0)
+	if(max_pin >= 0 && dir)
         {
- 	    if (read_switch(max_pin) && dir)
+ 	    if (read_switch(max_pin))
  		return false;
         }
 #endif
@@ -416,7 +435,9 @@ void cartesian_dda::disable_steppers()
 #if DISABLE_Z
         digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 #endif
-        ex[extruder_in_use]->disableStep();       
+
+        ex[extruder_in_use]->disableStep();
+        
 #endif
 }
 

@@ -168,6 +168,7 @@ public:
 private:
 
    char my_name;
+   int setTemp;
    char commandBuffer[RS485_BUF_LEN];
    char* reply;
    bool stp;
@@ -187,6 +188,7 @@ inline extruder::extruder(char name)
   pinMode(E_DIR_PIN, OUTPUT);
   digitalWrite(E_STEP_PIN, 0);
   digitalWrite(E_DIR_PIN, 0);
+  setTemperature(0);
   stp = false;
 }
 
@@ -234,6 +236,7 @@ inline  void extruder::setCooler(byte e_speed)
 
 inline  void extruder::setTemperature(int temp)
 {
+   setTemp = temp;
    buildNumberCommand(SET_T, temp);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);  
 }
@@ -243,7 +246,6 @@ inline  int extruder::getTemperature()
    buildCommand(GET_T);
    char* reply = talker.sendPacketAndGetReply(my_name, commandBuffer);
    return(atoi(reply));
-   //return 10;   
 }
 
 inline  void extruder::manage()
@@ -268,7 +270,7 @@ inline void extruder::setDirection(bool direction)
 inline  void extruder::sStep()
 {
    //buildCommand(STEP);
-   //talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+   //talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer); 
    stp = !stp;
    if(stp)
      digitalWrite(E_STEP_PIN, 1);
@@ -278,7 +280,7 @@ inline  void extruder::sStep()
 
 inline  void extruder::enableStep()
 {
-  // Not needed
+  // Not needed - stepping the motor enables it automatically
   /*
    buildCommand(ENABLE);
    talker.sendPacketAndGetReply(my_name, commandBuffer);
@@ -287,11 +289,12 @@ inline  void extruder::enableStep()
 
 inline  void extruder::disableStep()
 {
-  // Disabling the extrude stepper causes the backpressure to
-  // turn the motor the wrong way.  Leave it on.
-  
-  //buildCommand(DISABLE);
-  //talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+  // N.B. Disabling the extrude stepper causes the backpressure to
+  // turn the motor the wrong way.  Usually leave it on.
+#if DISABLE_E  
+  buildCommand(DISABLE);
+  talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+#endif
 }
 
 inline int extruder::potVoltage()

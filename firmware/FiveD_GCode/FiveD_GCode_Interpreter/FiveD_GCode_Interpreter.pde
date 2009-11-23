@@ -126,12 +126,12 @@ void setup()
   
   init_process_string();
   
-  where_i_am.x = 0.0;
+/*  where_i_am.x = 0.0;
   where_i_am.y = 0.0;
   where_i_am.z = 0.0;
   where_i_am.e = 0.0;
   where_i_am.f = SLOW_XY_FEEDRATE;
-  
+*/  
   Serial.begin(HOST_BAUD);
   Serial.println("start");
   
