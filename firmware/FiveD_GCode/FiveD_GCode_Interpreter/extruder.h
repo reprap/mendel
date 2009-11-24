@@ -214,7 +214,7 @@ inline void extruder::buildNumberCommand(char c, int v)
 
 inline  void extruder::waitForTemperature()
 {
-  
+   //while(getTemperature() < (setTemp - 10)) delay(2000);
 }
 
 inline  void extruder::valveSet(bool open, int dTime)
@@ -238,7 +238,8 @@ inline  void extruder::setTemperature(int temp)
 {
    setTemp = temp;
    buildNumberCommand(SET_T, temp);
-   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);  
+   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+   waitForTemperature();  
 }
 
 inline  int extruder::getTemperature()
