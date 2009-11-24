@@ -71,6 +71,7 @@ cartesian_dda::cartesian_dda()
 
 // Switch between mm and inches
 
+
 void cartesian_dda::set_units(bool using_mm)
 {
     if(using_mm)
@@ -183,11 +184,12 @@ void cartesian_dda::set_target(const FloatPoint& p)
         return;        
 }
 
+
 void cartesian_dda::dda_step()
 {  
   if(!live)
    return;
-   
+
   do
   {
 		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
@@ -255,7 +257,7 @@ void cartesian_dda::dda_step()
 			
 			if (dda_counter.e > 0)
 			{
-                         
+                                
 				do_e_step();
                                 real_move = true;
 				dda_counter.e -= total_steps;
@@ -297,7 +299,6 @@ void cartesian_dda::dda_step()
                 }
   } while (!real_move && f_can_step);
   
-
   live = (x_can_step || y_can_step || z_can_step  || e_can_step || f_can_step);
 
 // Wrap up at the end of a line
@@ -370,7 +371,7 @@ void cartesian_dda::dda_start()
 }
 
 
-bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long target, bool dir)
+bool cartesian_dda::can_step(int min_pin, int max_pin, long current, long target, bool dir)
 {
 
   //stop us if we're on target

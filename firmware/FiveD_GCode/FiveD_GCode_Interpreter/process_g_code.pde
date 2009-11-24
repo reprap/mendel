@@ -121,6 +121,7 @@ void get_and_do_command()
 	if (Serial.available())
 	{
 		c = Serial.read();
+                blink();
                 if(c == '\r')
                   c = '\n';
                 // Throw away control chars except \n

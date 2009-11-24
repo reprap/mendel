@@ -29,26 +29,26 @@ private:
   LongPoint dda_counter;       // DDA error-accumulation variables
   long t_scale;                // When doing lots of t steps, scale them so the DDA doesn't spend for ever on them
   
-  bool x_direction;            // Am I going in the + or - direction?
-  bool y_direction;
-  bool z_direction;
-  bool e_direction;
-  bool f_direction;
+  volatile bool x_direction;            // Am I going in the + or - direction?
+  volatile bool y_direction;
+  volatile bool z_direction;
+  volatile bool e_direction;
+  volatile bool f_direction;
 
-  bool x_can_step;             // Am I not at an endstop?  Have I not reached the target? etc.
-  bool y_can_step;
-  bool z_can_step;
-  bool e_can_step;
-  bool f_can_step;
+  volatile bool x_can_step;             // Am I not at an endstop?  Have I not reached the target? etc.
+  volatile bool y_can_step;
+  volatile bool z_can_step;
+  volatile bool e_can_step;
+  volatile bool f_can_step;
 
 // Variables for acceleration calculations
 
-  long total_steps;            // The number of steps to take along the longest movement axis
+  volatile long total_steps;            // The number of steps to take along the longest movement axis
   
   long timestep;               // microseconds
   bool nullmove;               // this move is zero length
-  bool real_move;              // Flag to know if we've changed something physical
-  volatile bool live;                   // Flag for when we're plotting a line
+  volatile bool real_move;     // Flag to know if we've changed something physical
+  volatile bool live;          // Flag for when we're plotting a line
 
 // Internal functions that need not concern the user
 
@@ -61,7 +61,7 @@ private:
   
   // Can this axis step?
   
-  bool can_step(byte min_pin, byte max_pin, long current, long target, bool dir);
+  bool can_step(int min_pin, int max_pin, long current, long target, bool dir);
   
   // Read a limit switch
   

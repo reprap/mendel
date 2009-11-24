@@ -31,7 +31,7 @@ byte extruder_in_use = 0;
 
 // Text placed in this (terminated with 0) will be transmitted back to the host
 // along with the next G Code acknowledgement.
-char debugstring[20];
+char debugstring[100];
 
 #if MOTHERBOARD < 2
 
@@ -73,6 +73,7 @@ static cartesian_dda cdda3;
 
 volatile byte head;
 volatile byte tail;
+bool led;
 
 unsigned char interruptBlink;
 
@@ -87,10 +88,12 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
   disableTimerInterrupt();
   
   interruptBlink++;
-  if(interruptBlink & 0x80)
-      digitalWrite(DEBUG_PIN, 1);
-  else
-      digitalWrite(DEBUG_PIN, 0); 
+  if(interruptBlink == 0x80)
+  {
+     blink();
+     interruptBlink = 0; 
+  }
+
       
   if(cdda[tail]->active())
       cdda[tail]->dda_step();
@@ -107,6 +110,7 @@ void setup()
   interruptBlink = 0;
   pinMode(DEBUG_PIN, OUTPUT);
   debugstring[0] = 0;
+  led = false;
   
   ex[0] = &ex0;
 #if EXTRUDER_COUNT == 2  
@@ -224,6 +228,15 @@ inline void setPosition(const FloatPoint& p)
 {
   where_i_am = p;  
 }
+
+void blink()
+{
+  led = !led;
+  if(led)
+      digitalWrite(DEBUG_PIN, 1);
+  else
+      digitalWrite(DEBUG_PIN, 0);
+} 
 
 
 //******************************************************************************************
