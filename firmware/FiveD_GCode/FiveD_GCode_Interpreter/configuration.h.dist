@@ -13,13 +13,17 @@
 
 #define MENDEL 1
 
-// The speed at which to talk with the host computer
+// The speed at which to talk with the host computer; default is 19200
 
 #define HOST_BAUD 19200
 
 // Set 1s where you have endstops; 0s where you don't
+// Mendel has MIN endstops, but not MAX ones.
+
 #define ENDSTOPS_MIN_ENABLED 1
 #define ENDSTOPS_MAX_ENABLED 0
+
+// The width of Henry VIII's thumb (or something).
 
 #define INCHES_TO_MM 25.4
 
