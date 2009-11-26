@@ -1,7 +1,21 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-// Here are the moterboard codes; set MOTHERBOARD to the right one
+/*
+ *  This is the configuration file for the RepRap Motherboard microcontroller.
+ *  Set values in it to match your RepRap machine.
+ *  
+ *  Lines in here with a 
+ *
+ *        // *RO
+ *
+ *  Comment at the end (read-only) should probably only be changed if you really
+ *  know what you are doing...
+ */
+
+// Here are the Motherboard codes; set MOTHERBOARD to the right one
+// A standard Mendel is MOTHERBOARD 2
+
 // (Arduino: 0 - no longer in use)
 // Sanguino or RepRap Motherboard with direct drive extruders: 1
 // RepRap Motherboard with RS485 extruders: 2
@@ -15,41 +29,41 @@
 
 // The speed at which to talk with the host computer; default is 19200
 
-#define HOST_BAUD 19200
+#define HOST_BAUD 19200 // *RO
 
 // Set 1s where you have endstops; 0s where you don't
-// Mendel has MIN endstops, but not MAX ones.
+// Both Darwin and Mendel have MIN endstops, but not MAX ones.
 
 #define ENDSTOPS_MIN_ENABLED 1
 #define ENDSTOPS_MAX_ENABLED 0
 
 // The width of Henry VIII's thumb (or something).
 
-#define INCHES_TO_MM 25.4
+#define INCHES_TO_MM 25.4 // *RO
 
 // The number of mm below which distances are insignificant (one tenth the
-// resolution of the machine is fine).
+// resolution of the machine is the default value).
 
-#define SMALL_DISTANCE 0.01
+#define SMALL_DISTANCE 0.01 // *RO
 
 // Useful to have its square
 
-#define SMALL_DISTANCE2 (SMALL_DISTANCE*SMALL_DISTANCE)
+#define SMALL_DISTANCE2 (SMALL_DISTANCE*SMALL_DISTANCE) // *RO
 
 #ifdef MENDEL
 
 // define the XYZ parameters of Mendel
 
 #define X_STEPS_PER_MM   10.047
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_X_DIR 0
 
 #define Y_STEPS_PER_MM   10.047
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Y_DIR 0
 
 #define Z_STEPS_PER_MM   563.877
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Z_DIR 0
 
 
@@ -58,15 +72,15 @@
 // This is for Darwin.
 
 #define X_STEPS_PER_MM   7.99735
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_X_DIR 0
 
 #define Y_STEPS_PER_MM   7.99735
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Y_DIR 0
 
 #define Z_STEPS_PER_MM   320
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Z_DIR 0
 
 #endif
@@ -76,8 +90,10 @@
 // extrude 1mm out of the nozzle.
 
 #define E_STEPS_PER_MM   0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+
 //#define E_STEPS_PER_MM   2.2       // NEMA 14 geared extruder 8mm diameter drive
-#define E_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM)
+
+#define E_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM) // *RO
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 3000.0
@@ -101,34 +117,39 @@
 #endif
 
 // Set these to 1 to disable an axis when it's not being used,
-// and for the extruder
+// and for the extruder.  Usually only Z is disabled when not in
+// use.  You will probably find that disabling the others (i.e.
+// powering down the steppers that drive them) when the ends of
+// movements are reached causes poor-quality builds.  (Inertia
+// causes overshoot if the motors are not left powered up.)
 
 #define DISABLE_X 0
 #define DISABLE_Y 0
 #define DISABLE_Z 1
 #define DISABLE_E 0
 
-// Set to one if sensor outputs inverting (ie: 1 means open, 0 means closed)
+// Set to one if the axis opto-sensor outputs inverting (ie: 1 means open, 0 means closed)
 // RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
-// are inverting
+// are inverting.
 
 #define ENDSTOPS_INVERTING 1
 
 //our command string length
-#define COMMAND_SIZE 128
+
+#define COMMAND_SIZE 128 // *RO
 
 // The size of the movement buffer
 
-#define BUFFER_SIZE 4
+#define BUFFER_SIZE 4 // *RO
 
 // Number of microseconds between timer interrupts when no movement
 // is happening
 
-#define DEFAULT_TICK (long)1000
+#define DEFAULT_TICK (long)1000 // *RO
 
 // What delay() value to use when waiting for things to free up in milliseconds
 
-#define WAITING_DELAY 1
+#define WAITING_DELAY 1 // *RO
 
 #if MOTHERBOARD > 1
 
@@ -136,9 +157,14 @@
 #define E0_NAME '0'           // Byte representing the name of extruder 0
 #define E1_NAME '1'           // Byte representing the name of extruder 1
 
-#define RS485_MASTER  1       // Set 0 for the slave
+#define RS485_MASTER  1       // *RO
 
 #endif
+
+//******************************************************************************
+
+// You probably only want to edit things below this line if you really really
+// know what you are doing...
 
 extern char debugstring[];
 
