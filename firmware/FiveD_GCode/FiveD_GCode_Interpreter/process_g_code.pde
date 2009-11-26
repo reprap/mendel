@@ -414,9 +414,7 @@ void process_string(char instruction[], int size)
 				break;
 
 			//turn extruder off
-			case 103:
-				ex[extruder_in_use]->setSpeed(0);
-				break;
+
 */
 			//custom code for temperature control
 			case 104:
@@ -448,6 +446,12 @@ void process_string(char instruction[], int size)
 				if (gc.seen & GCODE_S)
                                         ex[extruder_in_use]->setPWM((int)(255.0*gc.S + 0.5));
 #endif
+				break;
+
+                        // Set the temperature and wait for it to get there
+			case 109:
+				ex[extruder_in_use]->setTemperature((int)gc.S);
+                                ex[extruder_in_use]->waitForTemperature();
 				break;
 
 

@@ -103,12 +103,6 @@ inline void extruder::sStep()
    digitalWrite(motor_speed_pin, LOW);
 }
 
-inline void extruder::temperatureError()
-{
-      Serial.print("E: ");
-      Serial.println(getTemperature());  
-}
-
 
 inline void extruder::setDirection(bool dir)
 {
@@ -168,22 +162,22 @@ public:
 private:
 
    char my_name;
-   int setTemp;
+   int target_celcius;
+   int count;
+   int oldT, newT;
    char commandBuffer[RS485_BUF_LEN];
    char* reply;
    bool stp;
 
    void buildCommand(char c);   
    void buildCommand(char c, char v);
-   void buildNumberCommand(char c, int v);  
+   void buildNumberCommand(char c, int v);
+   void temperatureError();  
 };
 
 inline extruder::extruder(char name)
 {
   my_name = name;
-//  int v = potVoltage();
-//  strcpy(debugstring, reply);
-//  setPWM(v);
   pinMode(E_STEP_PIN, OUTPUT);
   pinMode(E_DIR_PIN, OUTPUT);
   digitalWrite(E_STEP_PIN, 0);
@@ -212,10 +206,7 @@ inline void extruder::buildNumberCommand(char c, int v)
 }
 
 
-inline  void extruder::waitForTemperature()
-{
-   //while(getTemperature() < (setTemp - 10)) delay(2000);
-}
+
 
 inline  void extruder::valveSet(bool open, int dTime)
 {
@@ -236,10 +227,9 @@ inline  void extruder::setCooler(byte e_speed)
 
 inline  void extruder::setTemperature(int temp)
 {
-   setTemp = temp;
+   target_celcius = temp;
    buildNumberCommand(SET_T, temp);
-   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
-   waitForTemperature();  
+   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer); 
 }
 
 inline  int extruder::getTemperature()
@@ -282,10 +272,7 @@ inline  void extruder::sStep()
 inline  void extruder::enableStep()
 {
   // Not needed - stepping the motor enables it automatically
-  /*
-   buildCommand(ENABLE);
-   talker.sendPacketAndGetReply(my_name, commandBuffer);
-  */
+
 }
 
 inline  void extruder::disableStep()

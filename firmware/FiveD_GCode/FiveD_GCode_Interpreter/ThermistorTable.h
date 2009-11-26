@@ -1,6 +1,9 @@
 #ifndef THERMISTORTABLE_H_
 #define THERMISTORTABLE_H_
 
+// How accurately do we maintain the temperature?
+#define HALF_DEAD_ZONE 5
+
 #if MOTHERBOARD < 2
 
 // Uncomment the next line if you are using a thermistor; leave it if you have a thermocouple
@@ -9,8 +12,7 @@
 // How many temperature samples to take for an average.  each sample takes about 100 usecs.
 #define TEMPERATURE_SAMPLES 3
 
-// How accurately do we maintain the temperature?
-#define HALF_DEAD_ZONE 5
+#endif
 
 // Thermistor lookup table for RepRap Temperature Sensor Boards (http://make.rrrf.org/ts)
 // See this page:  
@@ -51,4 +53,4 @@ short temptable[NUMTEMPS][2] = {
 
 #endif
 #endif
-#endif
+
