@@ -37,9 +37,12 @@ void newExtruder(byte e)
 
 void extruder::waitForTemperature()
 {
+  byte seconds = 0;
+  bool warming = true;
   count = 0;
   newT = 0;
   oldT = newT;
+
   while (true)
   {
     manageAllExtruders();
@@ -49,15 +52,24 @@ void extruder::waitForTemperature()
     {
       newT = newT/5;
       if(newT >= target_celcius - HALF_DEAD_ZONE)
-        return; 
-
-      if(newT > oldT)
-        oldT = newT;
-      else
       {
-        // Temp isn't increasing - extruder hardware error
-        temperatureError();
-        return;
+        warming = false;
+        if(seconds > WAIT_AT_TEMPERATURE)
+          return;
+        else 
+          seconds++;
+      } 
+
+      if(warming)
+      {
+        if(newT > oldT)
+          oldT = newT;
+        else
+        {
+          // Temp isn't increasing - extruder hardware error
+          temperatureError();
+          return;
+        }
       }
 
       newT = 0;

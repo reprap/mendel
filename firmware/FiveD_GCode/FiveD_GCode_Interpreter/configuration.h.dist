@@ -66,7 +66,6 @@
 #define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Z_DIR 0
 
-
 #else
 
 // This is for Darwin.
@@ -133,6 +132,13 @@
 // are inverting.
 
 #define ENDSTOPS_INVERTING 1
+
+// The number of 5-second intervals to wait at the target temperature for things to stabilise.
+// Too short, and the extruder will jam as only part of it will be hot enough.
+// Too long and the melt will extend too far up the insulating tube.
+// Default value: 10
+
+#define WAIT_AT_TEMPERATURE 10
 
 //our command string length
 
