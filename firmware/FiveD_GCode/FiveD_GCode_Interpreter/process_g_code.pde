@@ -454,6 +454,10 @@ void process_string(char instruction[], int size)
                                 ex[extruder_in_use]->waitForTemperature();
 				break;
 
+                        case 110:
+                                ex[extruder_in_use]->usePotForMotor();
+				break;
+
 
 // The valve (real, or virtual...) is now the way to control any extruder (such as
 // a pressurised paste extruder) that cannot move using E codes.

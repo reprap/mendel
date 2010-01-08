@@ -59,6 +59,10 @@ extruder::extruder()
   currentTemperature = 0;
   manageCount = 0;
   stp = 0;
+  potVal = 0;
+  potSum = 0;
+  potCount = 0;
+  usePot = true;
 }
 
 #ifdef  PID_CONTROL
@@ -121,6 +125,15 @@ void extruder::controlTemperature()
 void extruder::slowManage()
 {
   manageCount = 0;
+  
+  potSum += (potVoltage() >> 2);
+  potCount++;
+  if(potCount >= 10)
+  {
+    potVal = (byte)(potSum/10);
+    potCount = 0;
+    potSum = 0;
+  }
 
   //blink(true);  
 
@@ -256,7 +269,12 @@ int extruder::getTemperature()
 
 void extruder::sStep()
 {
-  byte pwm = pwmValue;
+  byte pwm;
+  
+  if(usePot)
+    pwm = potVal;
+  else
+    pwm = pwmValue;
 
   // This increments or decrements coilPosition then writes the appropriate pattern to the output pins.
 
@@ -360,6 +378,12 @@ int extruder::potVoltage()
 void extruder::setPWM(int p)
 {
   pwmValue = p;
+  usePot = false;
+}
+
+void extruder::usePotForMotor()
+{
+  usePot = true;
 }
 
 char* extruder::processCommand(char command[])
@@ -409,7 +433,11 @@ char* extruder::processCommand(char command[])
 
   case SPWM:
     setPWM(atoi(&command[1]));
-    break;      
+    break;
+
+  case UPFM:
+    usePotForMotor();
+    break;  
 
   case PING:
     break;

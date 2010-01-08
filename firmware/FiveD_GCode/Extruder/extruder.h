@@ -14,6 +14,7 @@
 #define DISABLE 'e'       // disableStep();
 #define PREAD 'R'         // read the pot voltage
 #define SPWM 'M'          // Set the motor PWM
+#define UPFM 'U'          // Use the pot to control the motor
 #define PING 'P'          // Just acknowledge
 
 // PID definitions
@@ -99,6 +100,10 @@ private:
 
    byte coilPosition;// Stepper position between 0 and 7 inclusive
    byte pwmValue;    // PWM to the motor
+   byte potVal;      // The averaged pot voltage
+   byte potCount;    // Averaging counter
+   int  potSum;      // For computing the pot average
+   bool usePot;      // True to control the motor by the pot
    byte stp;         // Tracks the step signal
    int  targetTemperature;        // Target temperature in C
    int  currentTemperature;           // Current temperature in C
@@ -136,7 +141,8 @@ private:
    void enableStep();
    void disableStep();
    int potVoltage();
-   void setPWM(int p); 
+   void setPWM(int p);
+   void usePotForMotor(); 
 };
 
 #endif

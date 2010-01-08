@@ -138,6 +138,7 @@ inline void extruder::setCooler(byte sp)
 #define DISABLE 'e'       // disableStep();
 #define PREAD 'R'         // read the pot voltage
 #define SPWM 'M'          // Set the motor PWM
+#define UPFM 'U'          // Use the pot to control the motor
 #define PING 'P'          // Just acknowledge
 
 class extruder
@@ -157,6 +158,7 @@ public:
    void disableStep();
    int potVoltage();
    void setPWM(int p);
+   void usePotForMotor();
    bool ping();
  
 private:
@@ -296,6 +298,12 @@ inline void extruder::setPWM(int p)
 {
    buildNumberCommand(SPWM, p);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);   
+}
+
+inline  void extruder::usePotForMotor()
+{ 
+  buildCommand(UPFM);
+  talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
 }
 
 inline bool extruder::ping()
