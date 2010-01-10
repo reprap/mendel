@@ -1036,7 +1036,7 @@ public class RrPolygonList
 	 * @param polAttributes
 	 * @return single CSG expression based on csgPols list 
 	 */
-	private RrCSGPolygon resolveInsides(List<RrCSG> csgPols)
+	private RrCSG resolveInsides(List<RrCSG> csgPols)
 	{
 		int i, j;
 		
@@ -1103,21 +1103,21 @@ public class RrPolygonList
 		
 		RrCSG expression = universe.buildCSG(csgPols);
 		
-		RrCSGPolygon res = new RrCSGPolygon(expression, box.scale(1.1), polygon(0).getAttributes());
+		//RrCSGPolygon res = new RrCSGPolygon(expression, box.scale(1.1), polygon(0).getAttributes());
 		//res.divide(0.0001, 0);
 		//RrGraphics g2 = new RrGraphics(res, true);
-		return res;		
+		return expression;		
 	}
 	
 	/**
 	 * Compute the CSG representation of all the polygons in the list
 	 * @return CSG representation
 	 */
-	public RrCSGPolygon toCSG(double tolerance)
+	public RrCSG toCSG(double tolerance)
 	{	
 		if(size() == 0)
 		{
-			return new RrCSGPolygon();
+			return RrCSG.nothing();
 		}
 		if(size() == 1)
 		{
@@ -1127,9 +1127,9 @@ public class RrPolygonList
 		List<RrCSG> csgPols = new ArrayList<RrCSG>();
 		
 		for(int i = 0; i < size(); i++)
-			csgPols.add(polygon(i).toCSG(tolerance).csg());
+			csgPols.add(polygon(i).toCSG(tolerance));
 		
-		RrCSGPolygon polygons = resolveInsides(csgPols);
+		RrCSG polygons = resolveInsides(csgPols);
 		//expression = expression.simplify(tolerance);
 		
 		return polygons;

@@ -7,7 +7,7 @@ import org.reprap.devices.GenericExtruder;
 import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrCSGPolygonList;
+//import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.Preferences;
 
 /**
@@ -89,7 +89,7 @@ public class LayerRules
 	/**
 	 * layers above and below where we are for infill and support calculations
 	 */
-	private RrCSGPolygonList [] layerRecord;
+	//private RrCSGPolygonList [] layerRecord;
 	
 	/**
 	 * The machineLayer value for each entry in layerRecord
@@ -161,14 +161,14 @@ public class LayerRules
 			}
 		}
 		
-		layerRecord = new RrCSGPolygonList[fineLayers+1];
+		//layerRecord = new RrCSGPolygonList[fineLayers+1];
 		recordNumber = new int[fineLayers+1];
 		layerPointer = 0;
-		for(int i = 0; i < layerRecord.length; i++)
-		{
-			layerRecord[i] = null;
-			recordNumber[i] = -1;
-		}
+//		for(int i = 0; i < layerRecord.length; i++)
+//		{
+//			layerRecord[i] = null;
+//			recordNumber[i] = -1;
+//		}
 	}
 	
 	public RrRectangle getBox()
@@ -176,30 +176,30 @@ public class LayerRules
 		return bBox;
 	}
 	
-	public void recordThisLayer(RrCSGPolygonList pl)
-	{
-		//if(layerRecord[layerPointer] != null)
-		//	layerRecord[layerPointer].destroy();
-		layerRecord[layerPointer] = pl;
-		recordNumber[layerPointer] = machineLayer;
-		layerPointer++;
-		if(layerPointer >= layerRecord.length)
-			layerPointer = 0;
-	}
+//	public void recordThisLayer(RrCSGPolygonList pl)
+//	{
+//		//if(layerRecord[layerPointer] != null)
+//		//	layerRecord[layerPointer].destroy();
+//		layerRecord[layerPointer] = pl;
+//		recordNumber[layerPointer] = machineLayer;
+//		layerPointer++;
+//		if(layerPointer >= layerRecord.length)
+//			layerPointer = 0;
+//	}
 	
 	/**
 	 * Return the layer i above where we are 
 	 * @param i
 	 * @return
 	 */
-	public RrCSGPolygonList getLayerAbove(int i)
-	{
-		int lp = layerPointer - i;
-		if(lp < 0)
-			return layerRecord[layerRecord.length + lp];
-		else
-			return layerRecord[lp];
-	}
+//	public RrCSGPolygonList getLayerAbove(int i)
+//	{
+//		int lp = layerPointer - i;
+//		if(lp < 0)
+//			return layerRecord[layerRecord.length + lp];
+//		else
+//			return layerRecord[lp];
+//	}
 	
 	public boolean getTopDown() { return topDown; }
 	

@@ -7,11 +7,12 @@ import org.reprap.Extruder;
 import org.reprap.Attributes;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrRectangle;
-import org.reprap.geometry.polygons.RrCSGPolygonList;
+//import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.geometry.polygons.STLSlice;
 import org.reprap.geometry.polygons.RrCSG;
-import org.reprap.geometry.polygons.RrCSGPolygon;
+//import org.reprap.geometry.polygons.RrCSGPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
@@ -154,19 +155,20 @@ public class Producer {
 				produceAdditiveGroundUp(gp);
 		}
 	}
-	
+
+	//FIXME: so I work with BooleanGrids
 	private void fillFoundationRectangle(Printer reprap, RrRectangle gp) throws Exception
 	{
-		RrCSG rect = RrCSG.RrCSGFromBox(gp);
-		gp = gp.scale(1.1);
-		Extruder e = reprap.getExtruder();
-		RrCSGPolygon rcp = new RrCSGPolygon(rect, gp, new Attributes(e.getMaterial(), null, null, 
-				e.getAppearance()));
-		rcp.divide(Preferences.tiny(), 1.01);
-		RrPolygonList h = rcp.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e));
-		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
-		lp.plot();
-		reprap.getExtruder().stopExtruding();
+//		RrCSG rect = RrCSG.RrCSGFromBox(gp);
+//		gp = gp.scale(1.1);
+//		Extruder e = reprap.getExtruder();
+//		RrCSGPolygon rcp = new RrCSGPolygon(rect, gp, new Attributes(e.getMaterial(), null, null, 
+//				e.getAppearance()));
+//		rcp.divide(Preferences.tiny(), 1.01);
+//		RrPolygonList h = rcp.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e));
+//		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
+//		lp.plot();
+//		reprap.getExtruder().stopExtruding();
 		//reprap.setFeedrate(reprap.getFastFeedrateXY());
 	}
 	
@@ -258,7 +260,7 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
+			BooleanGridList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
 					reprap.getExtruders()); 
 			
 			layer = null;
@@ -285,7 +287,7 @@ public class Producer {
 			reprap.betweenLayers(layerRules);
 			layer = null;
 			
-			slice.destroy();
+			//slice.destroy();
 			stlc.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
@@ -329,7 +331,7 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
+			BooleanGridList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
 					reprap.getExtruders()); 
 			
 			layer = null;
@@ -356,7 +358,7 @@ public class Producer {
 			reprap.betweenLayers(layerRules);
 			layer = null;
 			
-			slice.destroy();
+			//slice.finalize();
 			stlc.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());

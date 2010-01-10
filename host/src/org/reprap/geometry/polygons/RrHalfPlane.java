@@ -73,7 +73,7 @@ class lineIntersection
 	/**
 	 * Quad containing hit plane 
 	 */
-	private RrCSGPolygon quad = null;
+	//private RrCSGPolygon quad = null;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -88,9 +88,9 @@ class lineIntersection
 		if(beingDestroyed) // Prevent infinite loop
 			return;
 		beingDestroyed = true;
-		if(quad != null)
-			quad.destroy();
-		quad = null;
+//		if(quad != null)
+//			quad.destroy();
+//		quad = null;
 	}
 	
 	/**
@@ -98,19 +98,19 @@ class lineIntersection
 	 */
 	protected void finalize() throws Throwable
 	{
-		quad = null;
-		super.finalize();
+//		quad = null;
+//		super.finalize();
 	}
 	
-	/**
-	 * @param v
-	 * @param q
-	 */
-	public lineIntersection(double v, RrCSGPolygon q)
-	{
-		t = v;
-		quad = q;
-	}
+//	/**
+//	 * @param v
+//	 * @param q
+//	 */
+//	public lineIntersection(double v, RrCSGPolygon q)
+//	{
+//		t = v;
+//		quad = q;
+//	}
 	
 	/**
 	 * @return
@@ -120,7 +120,7 @@ class lineIntersection
 	/**
 	 * @return
 	 */
-	public RrCSGPolygon quad() { return quad; }
+//	public RrCSGPolygon quad() { return quad; }
 }
 
 
@@ -262,243 +262,243 @@ public class RrHalfPlane
 		return pLine().point(getParameter(i));
 	}
 	
-	/**
-	 * Get the i-th quad
-	 * @param i
-	 * @return i-th quad
-	 */
-	public RrCSGPolygon getQuad(int i)
-	{
-		return (crossings.get(i)).quad();
-	}
+//	/**
+//	 * Get the i-th quad
+//	 * @param i
+//	 * @return i-th quad
+//	 */
+//	public RrCSGPolygon getQuad(int i)
+//	{
+//		return (crossings.get(i)).quad();
+//	}
 	
-	/**
-	 * Get the i-th CSG for the plane
-	 * @param i
-	 * @return i-th CSG
-	 */
-	public RrCSG getCSG(int i)
-	{
-		RrCSGPolygon q = getQuad(i);
-		if(q.csg().complexity() == 1)
-			return q.csg();
-		else if(q.csg().complexity() == 2)
-		{
-			if(q.csg().c_1().plane() == this)
-				return q.csg().c_2();
-			if(q.csg().c_2().plane() == this)			
-				return q.csg().c_1();
-			
-			double t = getParameter(i);
-			double v = Math.abs(q.csg().c_1().plane().value(pLine().point(t)));
-			if(Math.abs(q.csg().c_2().plane().value(pLine().point(t))) < v)
-				return q.csg().c_2();
-			else
-				return q.csg().c_1();
-		}
-		
-		System.err.println("RrHalfPlane.getCSG(): complexity: " + q.csg().complexity());
-		return RrCSG.nothing();
-	}
+//	/**
+//	 * Get the i-th CSG for the plane
+//	 * @param i
+//	 * @return i-th CSG
+//	 */
+//	public RrCSG getCSG(int i)
+//	{
+//		RrCSGPolygon q = getQuad(i);
+//		if(q.csg().complexity() == 1)
+//			return q.csg();
+//		else if(q.csg().complexity() == 2)
+//		{
+//			if(q.csg().c_1().plane() == this)
+//				return q.csg().c_2();
+//			if(q.csg().c_2().plane() == this)			
+//				return q.csg().c_1();
+//			
+//			double t = getParameter(i);
+//			double v = Math.abs(q.csg().c_1().plane().value(pLine().point(t)));
+//			if(Math.abs(q.csg().c_2().plane().value(pLine().point(t))) < v)
+//				return q.csg().c_2();
+//			else
+//				return q.csg().c_1();
+//		}
+//		
+//		System.err.println("RrHalfPlane.getCSG(): complexity: " + q.csg().complexity());
+//		return RrCSG.nothing();
+//	}
 	
-	/**
-	 * Get the i-th plane.
-	 * @param i
-	 * @return i-th plane
-	 */
-	public RrHalfPlane getPlane(int i)
-	{
-		return getCSG(i).plane();
-	}
+//	/**
+//	 * Get the i-th plane.
+//	 * @param i
+//	 * @return i-th plane
+//	 */
+//	public RrHalfPlane getPlane(int i)
+//	{
+//		return getCSG(i).plane();
+//	}
 	
-	/**
-	 * Take the sorted list of parameter values and a shape, and
-	 * make sure they alternate solid/void/solid etc.  Insert
-	 * duplicate parameter values if need be to ensure this,
-	 * or - if two are very close - delete one. 
-	 * @param p
-	 */
-	public void solidSet(RrCSGPolygon p)
-	{
-		double v;
-		boolean odd = true;
-		int i = 0;
-		while(i < size() - 1)
-		{
-			double pi = getParameter(i);
-			double pi1 = getParameter(i+1);
-			v = 0.5*(pi + pi1);
-			boolean tiny = Math.abs(pi1 - pi) < 2*Math.sqrt(p.box().dSquared()); // Is this too coarse a limit?
-			v = p.value(pLine().point(v));
-			if(odd)
-			{
-				if(v > 0)
-				{
-					if(tiny)
-						crossings.remove(i);
-					else
-						crossings.add(i, crossings.get(i));
-				}
-			} else
-			{
-				if(v <= 0)
-				{
-					if(tiny)
-						crossings.remove(i);
-					else
-						crossings.add(i, crossings.get(i));
-				}	
-			}
-			odd = !odd;
-			i++;
-		}
-		if (size()%2 != 0)    // Nasty hack that seems to work...
-		{
-			System.err.println("RrHalfPlane.solidSet(): odd number of crossings: " +
-					size());
-			crossings.remove(size() - 1);
-		}
-	}
+//	/**
+//	 * Take the sorted list of parameter values and a shape, and
+//	 * make sure they alternate solid/void/solid etc.  Insert
+//	 * duplicate parameter values if need be to ensure this,
+//	 * or - if two are very close - delete one. 
+//	 * @param p
+//	 */
+//	public void solidSet(RrCSGPolygon p)
+//	{
+//		double v;
+//		boolean odd = true;
+//		int i = 0;
+//		while(i < size() - 1)
+//		{
+//			double pi = getParameter(i);
+//			double pi1 = getParameter(i+1);
+//			v = 0.5*(pi + pi1);
+//			boolean tiny = Math.abs(pi1 - pi) < 2*Math.sqrt(p.box().dSquared()); // Is this too coarse a limit?
+//			v = p.value(pLine().point(v));
+//			if(odd)
+//			{
+//				if(v > 0)
+//				{
+//					if(tiny)
+//						crossings.remove(i);
+//					else
+//						crossings.add(i, crossings.get(i));
+//				}
+//			} else
+//			{
+//				if(v <= 0)
+//				{
+//					if(tiny)
+//						crossings.remove(i);
+//					else
+//						crossings.add(i, crossings.get(i));
+//				}	
+//			}
+//			odd = !odd;
+//			i++;
+//		}
+//		if (size()%2 != 0)    // Nasty hack that seems to work...
+//		{
+//			System.err.println("RrHalfPlane.solidSet(): odd number of crossings: " +
+//					size());
+//			crossings.remove(size() - 1);
+//		}
+//	}
 
 	
-	/**
-	 * Add ??? if it contains ??? with a parameter within bounds.
-	 * @param p
-	 * @param q
-	 * @param range
-	 * @param me
-	 * @return true if ??? may be added, otherwise false
-	 */
-	private boolean maybeAdd(RrHalfPlane p, RrCSGPolygon q, RrInterval range, boolean me)
-	{	
-		// Ensure no duplicates
-		
-		for(int i = 0; i < size(); i++)
-		{
-			if(getPlane(i) == p)
-				return false;     // Because we've already got it
-		}
-		
-		RrInterval newRange = q.box().wipe(pLine(), range);
-		if(!newRange.empty())
-			try
-		{
-				double v = p.cross_t(pLine());
-				if(v >= newRange.low() && v < newRange.high())
-				{
-					if(me)
-					{
-						crossings.add(new lineIntersection(v, q));
-						return true;						
-					} else
-					{
-						Rr2Point x = pLine().point(v);
-						double r = Math.sqrt(q.resolution2());
-						double pot = q.csg().value(x);
-						if(pot > -r && pot < r)
-						{
-							crossings.add(new lineIntersection(v, q));
-							return true;
-						}
-					}
-				}
-		} catch (RrParallelLineException ple)
-		{}
-		return false;
-	}
+//	/**
+//	 * Add ??? if it contains ??? with a parameter within bounds.
+//	 * @param p
+//	 * @param q
+//	 * @param range
+//	 * @param me
+//	 * @return true if ??? may be added, otherwise false
+//	 */
+//	private boolean maybeAdd(RrHalfPlane p, RrCSGPolygon q, RrInterval range, boolean me)
+//	{	
+//		// Ensure no duplicates
+//		
+//		for(int i = 0; i < size(); i++)
+//		{
+//			if(getPlane(i) == p)
+//				return false;     // Because we've already got it
+//		}
+//		
+//		RrInterval newRange = q.box().wipe(pLine(), range);
+//		if(!newRange.empty())
+//			try
+//		{
+//				double v = p.cross_t(pLine());
+//				if(v >= newRange.low() && v < newRange.high())
+//				{
+//					if(me)
+//					{
+//						crossings.add(new lineIntersection(v, q));
+//						return true;						
+//					} else
+//					{
+//						Rr2Point x = pLine().point(v);
+//						double r = Math.sqrt(q.resolution2());
+//						double pot = q.csg().value(x);
+//						if(pot > -r && pot < r)
+//						{
+//							crossings.add(new lineIntersection(v, q));
+//							return true;
+//						}
+//					}
+//				}
+//		} catch (RrParallelLineException ple)
+//		{}
+//		return false;
+//	}
 	
-	/**
-	 * Add quad q if it contains a half-plane with an 
-	 * intersection with a parameter within bounds.
-	 * @param q
-	 * @param range
-	 * @return true if quad q may be added, otherwise false
-	 */
-	public boolean maybeAdd(RrCSGPolygon q, RrInterval range)
-	{		
-		switch(q.csg().operator())
-		{
-		case NULL:
-		case UNIVERSE:
-			return false;
-		
-		case LEAF:
-			return maybeAdd(q.csg().plane(), q, range, false);
-			
-		case INTERSECTION:
-		case UNION:	
-			if(q.csg().complexity() != 2)
-			{
-				System.err.println("RrHalfPlane.maybeAdd(): too complex: " + q.csg().complexity());
-				return false;
-			}
-			RrHalfPlane p1 = q.csg().c_1().plane();
-			RrHalfPlane p2 = q.csg().c_2().plane();
-			if(p1 == this)
-				return maybeAdd(p2, q, range, true);
-			if(p2 == this)
-				return maybeAdd(p1, q, range, true);
-			
-			boolean b = maybeAdd(p1, q, range, false); 
-			b = b | maybeAdd(p2, q, range, false);
-			return b;
-			
-		default:
-			System.err.println("RrHalfPlane.maybeAdd(): invalid CSG operator!");
-		}
-		
-		return false;
-	}
+//	/**
+//	 * Add quad q if it contains a half-plane with an 
+//	 * intersection with a parameter within bounds.
+//	 * @param q
+//	 * @param range
+//	 * @return true if quad q may be added, otherwise false
+//	 */
+//	public boolean maybeAdd(RrCSGPolygon q, RrInterval range)
+//	{		
+//		switch(q.csg().operator())
+//		{
+//		case NULL:
+//		case UNIVERSE:
+//			return false;
+//		
+//		case LEAF:
+//			return maybeAdd(q.csg().plane(), q, range, false);
+//			
+//		case INTERSECTION:
+//		case UNION:	
+//			if(q.csg().complexity() != 2)
+//			{
+//				System.err.println("RrHalfPlane.maybeAdd(): too complex: " + q.csg().complexity());
+//				return false;
+//			}
+//			RrHalfPlane p1 = q.csg().c_1().plane();
+//			RrHalfPlane p2 = q.csg().c_2().plane();
+//			if(p1 == this)
+//				return maybeAdd(p2, q, range, true);
+//			if(p2 == this)
+//				return maybeAdd(p1, q, range, true);
+//			
+//			boolean b = maybeAdd(p1, q, range, false); 
+//			b = b | maybeAdd(p2, q, range, false);
+//			return b;
+//			
+//		default:
+//			System.err.println("RrHalfPlane.maybeAdd(): invalid CSG operator!");
+//		}
+//		
+//		return false;
+//	}
 	
-	/**
-	 * Add a crossing
-	 * @param qc
-	 */
-	public static boolean cross(RrCSGPolygon qc)
-	{		
-		if(qc.corner())
-		{
-			RrInterval range = RrInterval.bigInterval();
-			boolean b = qc.csg().c_1().plane().maybeAdd(qc, range);
-			range = RrInterval.bigInterval();
-			b = b & qc.csg().c_2().plane().maybeAdd(qc, range);
-			return (b);
-		}
-		System.err.println("RrHalfPlane.cross(): called for non-corner!");
-		return false;
-	}
+//	/**
+//	 * Add a crossing
+//	 * @param qc
+//	 */
+//	public static boolean cross(RrCSGPolygon qc)
+//	{		
+//		if(qc.corner())
+//		{
+//			RrInterval range = RrInterval.bigInterval();
+//			boolean b = qc.csg().c_1().plane().maybeAdd(qc, range);
+//			range = RrInterval.bigInterval();
+//			b = b & qc.csg().c_2().plane().maybeAdd(qc, range);
+//			return (b);
+//		}
+//		System.err.println("RrHalfPlane.cross(): called for non-corner!");
+//		return false;
+//	}
 	
-	/**
-	 * Find a crossing
-	 * @param q
-	 * @return the index of the quad
-	 */
-	public int find(RrCSGPolygon q)
-	{	
-		for(int i = 0; i < size(); i++)
-		{
-			if(getQuad(i) == q)
-				return i;
-		}
-		System.err.println("RrHalfPlane.find(): quad not found!");
-		return -1;
-	}
+//	/**
+//	 * Find a crossing
+//	 * @param q
+//	 * @return the index of the quad
+//	 */
+//	public int find(RrCSGPolygon q)
+//	{	
+//		for(int i = 0; i < size(); i++)
+//		{
+//			if(getQuad(i) == q)
+//				return i;
+//		}
+//		System.err.println("RrHalfPlane.find(): quad not found!");
+//		return -1;
+//	}
 	
-	/**
-	 * Find the index of a crossing plane
-	 * @param h
-	 * @return index of the plane
-	 */
-	public int find(RrHalfPlane h)
-	{	
-		for(int i = 0; i < size(); i++)
-		{
-			if(getPlane(i) == h)
-				return i;
-		}
-		System.err.println("RrHalfPlane.find(): plane not found!");
-		return -1;
-	}
+//	/**
+//	 * Find the index of a crossing plane
+//	 * @param h
+//	 * @return index of the plane
+//	 */
+//	public int find(RrHalfPlane h)
+//	{	
+//		for(int i = 0; i < size(); i++)
+//		{
+//			if(getPlane(i) == h)
+//				return i;
+//		}
+//		System.err.println("RrHalfPlane.find(): plane not found!");
+//		return -1;
+//	}
 	
 	/**
 	 * Remove all crossings
@@ -517,54 +517,54 @@ public class RrHalfPlane
 		crossings.remove(i);
 	}
 	
-	/**
-	 * Sort on ascending parameter value.
-	 * @param up use an ascending sort when true, descending when false
-	 */
-	public void sort(boolean up, RrCSGPolygon q)
-	{
-		if(up)
-		{
-			java.util.Collections.sort(crossings, 
-					new java.util.Comparator<lineIntersection>() 
-					{
-				public int compare(lineIntersection a, lineIntersection b)
-				{
-					if(((lineIntersection)a).parameter() < 
-							((lineIntersection)b).parameter())
-						return -1;
-					else if (((lineIntersection)a).parameter() > 
-					((lineIntersection)b).parameter())
-						return 1;
-					return 0;
-				}
-					}
-			);
-		} else
-		{
-			java.util.Collections.sort(crossings, 
-					new java.util.Comparator<lineIntersection>() 
-					{
-				public int compare(lineIntersection a, lineIntersection b)
-				{
-					if(((lineIntersection)a).parameter() > 
-							((lineIntersection)b).parameter())
-						return -1;
-					else if (((lineIntersection)a).parameter() < 
-					((lineIntersection)b).parameter())
-						return 1;
-					return 0;
-				}
-					}
-			);
-		}		
-		if(size()%2 != 0)
-		{
-			//System.err.println("RrHalfPlane.sort(): odd number of crossings: " +
-					//size());
-			solidSet(q);
-		}
-	}
+//	/**
+//	 * Sort on ascending parameter value.
+//	 * @param up use an ascending sort when true, descending when false
+//	 */
+//	public void sort(boolean up, RrCSGPolygon q)
+//	{
+//		if(up)
+//		{
+//			java.util.Collections.sort(crossings, 
+//					new java.util.Comparator<lineIntersection>() 
+//					{
+//				public int compare(lineIntersection a, lineIntersection b)
+//				{
+//					if(((lineIntersection)a).parameter() < 
+//							((lineIntersection)b).parameter())
+//						return -1;
+//					else if (((lineIntersection)a).parameter() > 
+//					((lineIntersection)b).parameter())
+//						return 1;
+//					return 0;
+//				}
+//					}
+//			);
+//		} else
+//		{
+//			java.util.Collections.sort(crossings, 
+//					new java.util.Comparator<lineIntersection>() 
+//					{
+//				public int compare(lineIntersection a, lineIntersection b)
+//				{
+//					if(((lineIntersection)a).parameter() > 
+//							((lineIntersection)b).parameter())
+//						return -1;
+//					else if (((lineIntersection)a).parameter() < 
+//					((lineIntersection)b).parameter())
+//						return 1;
+//					return 0;
+//				}
+//					}
+//			);
+//		}		
+//		if(size()%2 != 0)
+//		{
+//			//System.err.println("RrHalfPlane.sort(): odd number of crossings: " +
+//					//size());
+//			solidSet(q);
+//		}
+//	}
 	
 	
 	

@@ -71,7 +71,7 @@ import org.reprap.geometry.polygons.BooleanGrid;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.RrCSGOp;
-import org.reprap.geometry.polygons.RrCSGPolygon;
+//import org.reprap.geometry.polygons.RrCSGPolygon;
 import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.RrInterval;
 import org.reprap.geometry.polygons.RrLine;
@@ -126,7 +126,7 @@ public class RrGraphics
 	/**
 	 * 
 	 */
-	private RrCSGPolygon csg_p = null;
+	//private RrCSGPolygon csg_p = null;
 	
 	/**
 	 * 
@@ -187,7 +187,7 @@ public class RrGraphics
 	public RrGraphics(RrRectangle b, String t) 
 	{
 		p_list = null;
-		csg_p = null;
+		//csg_p = null;
 		stlc = null;
 		hp = null;
 		title = t;
@@ -202,7 +202,7 @@ public class RrGraphics
 	public RrGraphics(String t) 
 	{
 		p_list = null;
-		csg_p = null;
+		//csg_p = null;
 		stlc = null;
 		hp = null;
 		title = t;
@@ -212,6 +212,9 @@ public class RrGraphics
 	public void cleanPolygons()
 	{
 		p_list = null;
+		//csg_p = null;
+		stlc = null;
+		hp = null;
 	}
 //	/**
 //	 * Constructor for point-list polygon
@@ -552,98 +555,98 @@ public class RrGraphics
 		plot(a.point(i.high()));
 	}
 	
-	/**
-	 * Recursively fill a CSG quad where it's solid.
-	 * @param q
-	 */
-	private void fillCSG(RrCSGPolygon q)
-	{
-		if(RrRectangle.intersection(q.box(), scaledBox).empty())
-			return;
-		
-		if(q.c_1() != null)
-		{
-			fillCSG(q.c_1());
-			fillCSG(q.c_2());
-			fillCSG(q.c_3());
-			fillCSG(q.c_4());
-			return;
-		}
-		
-		if(q.csg().operator() == RrCSGOp.NULL)
-			return;
-			
-		g2d.setColor(infill);
-		Rr2Point sw = transform(q.box().sw());
-		Rr2Point ne = transform(q.box().ne());
-
-		int x0 = (int)Math.round(sw.x());
-		int y0 = (int)Math.round(sw.y());
-		int x1 = (int)Math.round(ne.x());
-		int y1 = (int)Math.round(ne.y());
-
-		if(q.csg().operator() == RrCSGOp.UNIVERSE)
-		{
-			g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
-			return;
-		}
-
-		for(int x = x0; x <= x1; x++)
-		{
-			for(int y = y1; y <= y0; y++)  // Bloody backwards coordinates...
-			{
-				Rr2Point p = iTransform(x, y);
-				double v = q.csg().value(p);
-				if(v <= 0)
-					g2d.fillRect(x, y, 1, 1);
-			}
-		}
-
-	}
-	
-	private void boxCSG(RrCSGPolygon q)
-	{
-		if(RrRectangle.intersection(q.box(), scaledBox).empty())
-			return;
-		
-		if(q.c_1() != null)
-		{
-			boxCSG(q.c_1());
-			boxCSG(q.c_2());
-			boxCSG(q.c_3());
-			boxCSG(q.c_4());
-			return;
-		}
-		plot(q.box());
-	}
-	
-	/**
-	 * Plot a divided CSG polygon recursively
-	 * @param p
-	 */
-	private void plot(RrCSGPolygon q)
-	{
-		if(RrRectangle.intersection(q.box(), scaledBox).empty())
-			return;		
-		
-		if(q.c_1() != null)
-		{
-			plot(q.c_1());
-			plot(q.c_2());
-			plot(q.c_3());
-			plot(q.c_4());
-			return;
-		}
-		
-		g2d.setColor(polygon1);
-		if(q.csg().complexity() == 1)
-			plot(q.csg().plane().pLine(), q.interval1());
-		else if (q.csg().complexity() == 2)
-		{
-			plot(q.csg().c_1().plane().pLine(), q.interval1());
-			plot(q.csg().c_2().plane().pLine(), q.interval2());
-		}
-	}
+//	/**
+//	 * Recursively fill a CSG quad where it's solid.
+//	 * @param q
+//	 */
+//	private void fillCSG(RrCSGPolygon q)
+//	{
+//		if(RrRectangle.intersection(q.box(), scaledBox).empty())
+//			return;
+//		
+//		if(q.c_1() != null)
+//		{
+//			fillCSG(q.c_1());
+//			fillCSG(q.c_2());
+//			fillCSG(q.c_3());
+//			fillCSG(q.c_4());
+//			return;
+//		}
+//		
+//		if(q.csg().operator() == RrCSGOp.NULL)
+//			return;
+//			
+//		g2d.setColor(infill);
+//		Rr2Point sw = transform(q.box().sw());
+//		Rr2Point ne = transform(q.box().ne());
+//
+//		int x0 = (int)Math.round(sw.x());
+//		int y0 = (int)Math.round(sw.y());
+//		int x1 = (int)Math.round(ne.x());
+//		int y1 = (int)Math.round(ne.y());
+//
+//		if(q.csg().operator() == RrCSGOp.UNIVERSE)
+//		{
+//			g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
+//			return;
+//		}
+//
+//		for(int x = x0; x <= x1; x++)
+//		{
+//			for(int y = y1; y <= y0; y++)  // Bloody backwards coordinates...
+//			{
+//				Rr2Point p = iTransform(x, y);
+//				double v = q.csg().value(p);
+//				if(v <= 0)
+//					g2d.fillRect(x, y, 1, 1);
+//			}
+//		}
+//
+//	}
+//	
+//	private void boxCSG(RrCSGPolygon q)
+//	{
+//		if(RrRectangle.intersection(q.box(), scaledBox).empty())
+//			return;
+//		
+//		if(q.c_1() != null)
+//		{
+//			boxCSG(q.c_1());
+//			boxCSG(q.c_2());
+//			boxCSG(q.c_3());
+//			boxCSG(q.c_4());
+//			return;
+//		}
+//		plot(q.box());
+//	}
+//	
+//	/**
+//	 * Plot a divided CSG polygon recursively
+//	 * @param p
+//	 */
+//	private void plot(RrCSGPolygon q)
+//	{
+//		if(RrRectangle.intersection(q.box(), scaledBox).empty())
+//			return;		
+//		
+//		if(q.c_1() != null)
+//		{
+//			plot(q.c_1());
+//			plot(q.c_2());
+//			plot(q.c_3());
+//			plot(q.c_4());
+//			return;
+//		}
+//		
+//		g2d.setColor(polygon1);
+//		if(q.csg().complexity() == 1)
+//			plot(q.csg().plane().pLine(), q.interval1());
+//		else if (q.csg().complexity() == 2)
+//		{
+//			plot(q.csg().c_1().plane().pLine(), q.interval1());
+//			plot(q.csg().c_2().plane().pLine(), q.interval2());
+//		}
+//	}
 	
 	/**
 	 * Recursively fill a Boolean Grid where it's solid.
@@ -732,18 +735,24 @@ public class RrGraphics
 	 */
 	private void plot()
 	{
-		if(csg_p != null)
+		
+		if(bg != null)
 		{
-			if(csgSolid)
-				fillCSG(csg_p);
-			
-			if(plot_box)
-				boxCSG(csg_p);
-			//else
-				//plot(csg_p.box());
-			
-			plot(csg_p);
+			fillBG(bg);
 		}
+		
+//		if(csg_p != null)
+//		{
+//			if(csgSolid)
+//				fillCSG(csg_p);
+//			
+//			if(plot_box)
+//				boxCSG(csg_p);
+//			//else
+//				//plot(csg_p.box());
+//			
+//			plot(csg_p);
+//		}
 		
 		if(p_list != null)
 		{
@@ -773,10 +782,7 @@ public class RrGraphics
 			plot(hp);
 		}
 		
-		if(bg != null)
-		{
-			fillBG(bg);
-		}
+
 	}
 	
 	class myKB implements KeyListener
@@ -844,12 +850,12 @@ public class RrGraphics
 				break;
 
 			case MouseEvent.BUTTON2:
-				if(csg_p != null)
-				{
-					Rr2Point pc = iTransform(ix, iy);
-					JOptionPane.showMessageDialog(null, "Potential at " + pc.toString() + " is " + csg_p.value(pc) +
-							"\nQuad: " + csg_p.quad(pc).toString());
-				}
+//				if(csg_p != null)
+//				{
+//					Rr2Point pc = iTransform(ix, iy);
+//					JOptionPane.showMessageDialog(null, "Potential at " + pc.toString() + " is " + csg_p.value(pc) +
+//							"\nQuad: " + csg_p.quad(pc).toString());
+//				}
 				break;
 				
 			case MouseEvent.BUTTON3:

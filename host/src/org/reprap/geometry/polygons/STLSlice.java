@@ -824,6 +824,80 @@ public class STLSlice
 		return edges.get(i);
 	}
 	
+	private RrPolygon getNextPolygon()
+	{
+		if(edges.size() <= 0)
+			return null;
+		LineSegment next = segment(0);
+		edges.remove(0);
+		RrPolygon result = new RrPolygon(next.att, true);
+		result.add(next.a);
+		result.add(next.b);
+		Rr2Point start = next.a;
+		Rr2Point end = next.b;
+		
+		while(edges.size() > 0)
+		{
+			double d2 = Rr2Point.dSquared(start, end);
+			boolean aEnd = false;
+			int index = -1;
+			for(int i = 0; i < edges.size(); i++)
+			{
+				double dd = Rr2Point.dSquared(segment(i).a, end);
+				if(dd < d2)
+				{
+					d2 = dd;
+					aEnd = true;
+					index = i;
+				}
+				dd = Rr2Point.dSquared(segment(i).b, end);
+				if(dd < d2)
+				{
+					d2 = dd;
+					aEnd = false;
+					index = i;
+				}
+			}
+
+			if(index >= 0)
+			{
+				next = edges.get(index);
+				edges.remove(index);
+				int ipt = result.size() - 1;
+				if(aEnd)
+				{
+					result.set(ipt, Rr2Point.mul(Rr2Point.add(next.a, result.point(ipt)), 0.5));
+					result.add(next.b);
+					end = next.b;
+				} else
+				{
+					result.set(ipt, Rr2Point.mul(Rr2Point.add(next.b, result.point(ipt)), 0.5));
+					result.add(next.a);
+					end = next.a;				
+				}
+			} else
+				return result;
+		}
+		
+		Debug.d("STLSlice.getNextPolygon(): exhausted edge list!");
+		
+		return result;
+	}
+	
+	private RrPolygonList simpleCull()
+	{
+		RrPolygonList result = new RrPolygonList();
+		RrPolygon next = getNextPolygon();
+		while(next != null)
+		{
+			if(next.size() >= 3)
+				result.add(next);
+			next = getNextPolygon();
+		}
+		
+		return result;
+	}
+	
 	public Rr2Point segmentA(int i)
 	{
 		return edges.get(i).a;
@@ -854,8 +928,8 @@ public class STLSlice
 	 */
 	private double toGrid(double x)
 	{
-		//return x;
-		return (double)((int)(x*Preferences.grid() + 0.5))*Preferences.gridRes();
+		return x;
+		//return (double)((int)(x*Preferences.grid() + 0.5))*Preferences.gridRes();
 	}
 	
 	/**
@@ -1472,10 +1546,11 @@ public class STLSlice
 	 * @param z
 	 * @return a CSG representation of all the polygons in the slice
 	 */
-	public RrCSGPolygonList slice(double z, Extruder es[])
+	public BooleanGridList slice(double z, Extruder es[])
 	{
-		RrCSGPolygonList rl = new RrCSGPolygonList();
-
+		BooleanGridList rl = new BooleanGridList();
+		RrCSG csgp = null;
+		
 		if(generateLowerTriangles)
 			below = new BranchGroup();
 		else
@@ -1488,8 +1563,8 @@ public class STLSlice
 
 			if(aats.size() > 0)
 			{
-				Appearance ap = aats.get(0).att.getAppearance();
-
+				//Appearance ap = aats.get(0).att.getAppearance();
+				
 				for(int obj = 0; obj < aats.size(); obj++)
 				{
 					destroyLayer();
@@ -1510,12 +1585,14 @@ public class STLSlice
 					// segments.  Then we just run round joining up all the pairs of
 					// ends.
 
-					divide();
+					//divide();
 
 					// Run round joining up all the pairs of ends...
 
-					RrPolygonList pgl = conquer(this); //, fg, fs);
-
+					//RrPolygonList pgl = conquer(this); 
+					
+					RrPolygonList pgl = simpleCull();
+					
 					// Remove wrinkles
 
 					pgl = pgl.simplify(Preferences.gridRes()*1.5);
@@ -1524,24 +1601,39 @@ public class STLSlice
 
 					pgl = pgl.arcCompensate();
 
-
 					// Check for a silly result.
 
 					if(pgl.size() > 0)
 					{
-						rl.add(pgl.toCSG(Preferences.tiny()));
+						csgp = pgl.toCSG(Preferences.tiny());
+						rl.add(new BooleanGrid(csgp), attr);
+//						if(picture == null)
+//						{
+//						  picture = new RrGraphics("STL Slice");
+//						  picture.init(ObjectPlanRectangle(), false);
+//						}
+//
+//						picture.cleanPolygons();
+//						csgp.divide(0.0001, 1.0);
+//						//picture.add(pgl);
+//						picture.add(csgp);
 					}
 				}
 			}
 		}
 //		if(picture == null)
 //		{
-//		picture = new RrGraphics("STL Slice");
-//		picture.init(ObjectPlanRectangle(), false);
+//		  picture = new RrGraphics("STL Slice");
+//		  picture.init(ObjectPlanRectangle(), false);
 //		}
-
+//
 //		picture.cleanPolygons();
-//		picture.add(rl.get(0));
+//		if(rl.size() > 0)
+//		{
+//			csgp.divide(0.01, 1.0);
+//			picture.add(csgp);
+//			//picture.add(rl.get(0));
+//		}
 		return rl;
 	}
 }

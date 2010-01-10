@@ -292,7 +292,20 @@ public class RrPolygon
 			System.err.println("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		points.add(i, new Rr2Point(p));
 		box.expand(p);
-	}	
+	}
+	
+	/**
+	 * Set a point to be p
+	 * @param i
+	 * @param p
+	 */
+	public void set(int i, Rr2Point p)
+	{
+		if(speeds != null)
+			System.err.println("Rr2Point.set(): adding a point to a polygon with its speeds set.");
+		points.set(i, new Rr2Point(p));
+		box.expand(p);
+	}
 
 	/**
 	 * Insert a new point and speed into the polygon
@@ -306,6 +319,21 @@ public class RrPolygon
 			System.err.println("Rr2Point.add(): adding a point and a speed to a polygon without its speeds set.");
 		points.add(i, new Rr2Point(p));
 		speeds.add(i, s);
+		box.expand(p);
+	}
+	
+	/**
+	 * Set a new point and speed
+	 * @param i
+	 * @param p
+	 * @param s
+	 */
+	public void set(int i, Rr2Point p, double s)
+	{
+		if(speeds == null)
+			System.err.println("Rr2Point.set(): adding a point and a speed to a polygon without its speeds set.");
+		points.set(i, new Rr2Point(p));
+		speeds.set(i, s);
 		box.expand(p);
 	}
 	
@@ -1385,7 +1413,7 @@ public class RrPolygon
 	 * @param tolerance
 	 * @return CSG polygon object based on polygon and tolerance 
 	 */
-	public RrCSGPolygon toCSG(double tolerance)
+	public RrCSG toCSG(double tolerance)
 	{
 		
 		RrPolygon copy = new RrPolygon(this);
@@ -1396,13 +1424,13 @@ public class RrPolygon
 		int [] flags = new int[copy.size()];
 		RrCSG expression = copy.toCSGRecursive(all, 0, true, flags);
 
-		RrRectangle b = copy.box.scale(1.1);
+		//RrRectangle b = copy.box.scale(1.1);
 		//expression = expression.simplify(tolerance);
-		if(att == null)
-			System.err.println("toCSG(): null attribute!");
-		RrCSGPolygon result = new RrCSGPolygon(expression, b, att);
+		//if(att == null)
+		//	System.err.println("toCSG(): null attribute!");
+		//RrCSGPolygon result = new RrCSGPolygon(expression, b, att);
 		
-		return result;
+		return expression;
 	}
 	
 }

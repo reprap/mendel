@@ -1305,21 +1305,21 @@ public class RrCSG
     }
     
     
-    /**
-	 * For each half plane sort the crossing list.
-     */
-    public void sortCrossings(boolean up, RrCSGPolygon q)
-    {
-    	if(complexity() > 1)
-    	{
-    		c_1().sortCrossings(up, q);
-    		c_2().sortCrossings(up, q);
-    	} else
-    	{
-    		if(operator() == RrCSGOp.LEAF)
-    			plane().sort(up, q);
-    	}	
-    }
+//    /**
+//	 * For each half plane sort the crossing list.
+//     */
+//    public void sortCrossings(boolean up, RrCSGPolygon q)
+//    {
+//    	if(complexity() > 1)
+//    	{
+//    		c_1().sortCrossings(up, q);
+//    		c_2().sortCrossings(up, q);
+//    	} else
+//    	{
+//    		if(operator() == RrCSGOp.LEAF)
+//    			plane().sort(up, q);
+//    	}	
+//    }
 	
 	/**
 	 * Offset by a distance (+ve or -ve)

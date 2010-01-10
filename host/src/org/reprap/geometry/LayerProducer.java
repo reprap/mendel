@@ -16,7 +16,8 @@ import org.reprap.ReprapException;
 import org.reprap.Extruder;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrCSGPolygonList;
+//import org.reprap.geometry.polygons.RrCSGPolygonList;
+import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.RrRectangle;
@@ -120,9 +121,9 @@ public class LayerProducer {
 	private RrPolygonList borderPolygons = null;
 	
 	/**
-	 * CSG representation of the polygons as input
+	 * Boolean Grid representation of the polygons as input
 	 */
-	private RrCSGPolygonList csgP = null;
+	private BooleanGridList boolGrdSlice = null;
 	
 	/**
 	 * CSG representation of the polygons offset by the width of
@@ -134,7 +135,7 @@ public class LayerProducer {
 	 * CSG representation of the polygons offset by the factor of the
 	 * width of the extruders needed to lay down internal cross-hatching
 	 */	
-	RrCSGPolygonList offHatch = null;
+	BooleanGridList offHatch = null;
 	
 	/**
 	 * Counters use so that each material is plotted completely before
@@ -184,12 +185,12 @@ public class LayerProducer {
 			borderPolygons.destroy();
 		borderPolygons = null;
 		
-		if(csgP != null)
-			csgP.destroy();
-		csgP = null;
+		//if(boolGrdSlice != null)
+		//	boolGrdSlice.destroy();
+		boolGrdSlice = null;
 		
-		if(offHatch != null)
-			offHatch.destroy();
+		//if(offHatch != null)
+			//offHatch.destroy();
 		offHatch = null;
 		
 		if(startNearHere != null)
@@ -213,7 +214,7 @@ public class LayerProducer {
 		
 		hatchedPolygons = null;
 		borderPolygons = null;
-		csgP = null;
+		boolGrdSlice = null;
 		offHatch = null;
 		startNearHere = null;
 		super.finalize();
@@ -235,7 +236,7 @@ public class LayerProducer {
 		shellSet = false;
 		simulationPlot = simPlot;
 		
-		csgP = null;
+		boolGrdSlice = null;
 		
 		borderPolygons = null;
 		
@@ -255,30 +256,28 @@ public class LayerProducer {
 	
 	/**
 	 * Set up a normal layer
-	 * @param csgPols
+	 * @param boolGrdSliceols
 	 * @param ls
 	 * @param lc
 	 * @param simPlot
 	 * @throws Exception
 	 */
-	public LayerProducer(RrCSGPolygonList csgPols, BranchGroup ls, LayerRules lc, RrGraphics simPlot) throws Exception 
+	public LayerProducer(BooleanGridList bgPols, BranchGroup ls, LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
-		startNearHere = null; //new Rr2Point(0, 0);
+		startNearHere = null;
 		lowerShell = ls;
 		shellSet = false;
 		simulationPlot = simPlot;
 		
-		csgP = csgPols;
+		boolGrdSlice = bgPols;
 		
 		// The next two are experimental for the moment...
 		
 		//inFillCalculations();
 		//supportCalculations();
 		
-		offHatch = csgP.offset(layerConditions, false);
-		
-		BooleanGrid bg;
+		offHatch = boolGrdSlice.offset(layerConditions, false);
 		
 		if(layerConditions.getLayingSupport())
 		{
@@ -286,17 +285,11 @@ public class LayerProducer {
 			offHatch = offHatch.union(lc.getPrinter().getExtruders());
 		} else
 		{
-			RrCSGPolygonList offBorder = csgP.offset(layerConditions, true);
-			offBorder.divide(Preferences.tiny(), 1.01);
-			borderPolygons = offBorder.megList();
-//			borderPolygons = BooleanGrid.borders(offBorder);
+			BooleanGridList offBorder = boolGrdSlice.offset(layerConditions, true);
+			borderPolygons = offBorder.borders();
 		}
-		
-		offHatch.divide(Preferences.tiny(), 1.01);		
-		hatchedPolygons = new RrPolygonList();
-		hatchedPolygons.add(offHatch.hatch(layerConditions));
 			
-//		hatchedPolygons = BooleanGrid.hatch(layerConditions, offHatch);
+		hatchedPolygons = offHatch.hatch(layerConditions);
 
 
 		if(borderPolygons != null && borderPolygons.size() > 0)
@@ -345,7 +338,7 @@ public class LayerProducer {
 //		
 //		if(above == null)
 //		{
-//			layerConditions.recordThisLayer(csgP);
+//			layerConditions.recordThisLayer(boolGrdSlice);
 //			return;
 //		}
 //		
@@ -367,9 +360,9 @@ public class LayerProducer {
 //		// will need any support.
 //		
 //		RrCSGPolygon allThisLayer = new RrCSGPolygon();
-//		for(int i = 0; i < csgP.size(); i++)
+//		for(int i = 0; i < boolGrdSlice.size(); i++)
 //		{
-//			allThisLayer = RrCSGPolygon.union(csgP.get(i), allThisLayer);
+//			allThisLayer = RrCSGPolygon.union(boolGrdSlice.get(i), allThisLayer);
 //			if(i > 0)
 //				allThisLayer = allThisLayer.reEvaluate();
 //		}
@@ -409,7 +402,7 @@ public class LayerProducer {
 //				
 //				// Find the same material at this level
 //				
-//				thisLevel = csgP.find(aAboveLevel);
+//				thisLevel = boolGrdSlice.find(aAboveLevel);
 //				
 //				// If the material is in this level and the one above...
 //				
@@ -440,9 +433,9 @@ public class LayerProducer {
 //		// Add every material in this layer that has no equivalent in the layer
 //		// above as it may need support in the next layer down.
 //		
-//		for(int i = 0; i < csgP.size(); i++)
+//		for(int i = 0; i < boolGrdSlice.size(); i++)
 //		{
-//			thisLevel = csgP.get(i);
+//			thisLevel = boolGrdSlice.get(i);
 //			if(above.find(thisLevel.getAttributes()) == null)
 //				thisForTheRecord.add(thisLevel);	
 //		}
@@ -454,7 +447,7 @@ public class LayerProducer {
 //		
 //		// Add all the supports needed to this layer
 //		
-//		csgP.add(supports);
+//		boolGrdSlice.add(supports);
 //		
 //	}
 //	
@@ -475,7 +468,7 @@ public class LayerProducer {
 //		RrCSGPolygonList above = layerConditions.getLayerAbove(2);
 //		if(above == null)
 //		{
-//			layerConditions.recordThisLayer(csgP);
+//			layerConditions.recordThisLayer(boolGrdSlice);
 //			return;
 //		}
 //		
@@ -519,12 +512,12 @@ public class LayerProducer {
 //		
 //		// For each material in this layer
 //		
-//		for(int i = 0; i < csgP.size(); i++)
+//		for(int i = 0; i < boolGrdSlice.size(); i++)
 //		{
 //			// Get this material's shape in the above layer, its attributes,
 //			// the extruder used for it, and the name of its support material.
 //			
-//			pgThisLevel = csgP.get(i);
+//			pgThisLevel = boolGrdSlice.get(i);
 //			aThisLevel = pgThisLevel.getAttributes();
 //			eThisLevel = aThisLevel.getExtruder(es);
 //			inFillName = eThisLevel.getBroadInfillMaterial();
@@ -565,9 +558,9 @@ public class LayerProducer {
 //		
 //		// We now have two new collections of polygons representing this layer
 //		
-//		csgP = inFills;
-//		csgP.add(surfaces);
-//		layerConditions.recordThisLayer(csgP);
+//		boolGrdSlice = inFills;
+//		boolGrdSlice.add(surfaces);
+//		layerConditions.recordThisLayer(boolGrdSlice);
 //	}
 	
 	/**
