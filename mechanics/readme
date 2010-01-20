@@ -3,4 +3,6 @@ For details of how to put the RepRap mechanics together, see:
     http://objects.reprap.org/wiki/Mechanical_construction
     
 The Solid Edge files in here are supplied as they may be helpful to some,
-but please note that we do not support them.
+but please note that we do not support them.  In particular, they will not be
+updated as the parts designs in the AoI files are.  The AoI files should be 
+regarded as the master copies.
