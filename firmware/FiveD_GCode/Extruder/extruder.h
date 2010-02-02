@@ -24,6 +24,12 @@
 #define TEMP_PID_IGAIN 0.1
 #define TEMP_PID_DGAIN 100.0
 
+// Valve controller definitions
+
+#define VALVE_FORWARD 2
+#define VALVE_STOP 0
+#define VALVE_REVERSE 1
+
 //******************************************************************************************************
 
 // Divide by this to correct for the fact that we have
@@ -128,6 +134,12 @@ private:
 
 #endif
 
+#ifdef PASTE_EXTRUDER
+  bool requiredValveState;
+  bool actualValveState;
+  byte 
+#endif
+
    void waitForTemperature();
    void slowManage();
    int internalTemperature();
@@ -144,6 +156,7 @@ private:
    void setPWM(int p);
    void usePotForMotor(); 
 };
+
 
 #endif
 

@@ -31,6 +31,10 @@
 
 #define HOST_BAUD 19200 // *RO
 
+// The number of real extruders
+
+#define EXTRUDER_COUNT 1
+
 // Set 1s where you have endstops; 0s where you don't
 // Both Darwin and Mendel have MIN endstops, but not MAX ones.
 
@@ -203,6 +207,9 @@ inline void resetTimer()
 //*************************************************************************
 
 #if 0
+// Green machine:
+//#define ENDSTOPS_INVERTING 0
+
 // parameters for the Bath U. mendel prototype
 #define X_STEPS_PER_MM   13.333333
 #define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
@@ -212,7 +219,12 @@ inline void resetTimer()
 #define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
 #define INVERT_Y_DIR 0
 
-#define Z_STEPS_PER_MM   938.64
+// Green machine:
+#define Z_STEPS_PER_MM   944.88
+// Fat Z cog machine:
+//#define Z_STEPS_PER_MM   558.864
+// Standard Mendel:
+//#define Z_STEPS_PER_MM   833.398
 #define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
 #define INVERT_Z_DIR 0
 

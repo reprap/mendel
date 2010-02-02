@@ -3,7 +3,15 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#define MY_NAME '0'          // Two byte string representing the name of this device
+// Comment out the next line if this extruder is extruding thermoplastic
+
+#define PASTE_EXTRUDER
+
+#ifdef PASTE_EXTRUDER
+#define MY_NAME '1'          // Two byte string representing the name of this device
+#else
+#define MY_NAME '0' 
+#endif
 
 #define RS485_MASTER 0       // We are a slave
 
@@ -74,6 +82,12 @@
 #define OUTPUT_C 12
 
 #define DEBUG_PIN 13
+
+#ifdef PASTE_EXTRUDER
+#define TachoPin 10 
+#define SENSOR_PIN 15
+#define INFLATOR_PIN 12
+#endif
 
 // The LED blink function
 

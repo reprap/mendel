@@ -22,6 +22,14 @@ extruder::extruder()
   digitalWrite(TC_0,HIGH);  // Disable MAX6675
 #else
   pinMode(TEMP_PIN, INPUT);
+
+#ifdef PASTE_EXTRUDER
+  pinMode(SENSOR_PIN, OUTPUT);
+  pinMode(INFLATOR_PIN, OUTPUT);
+  pinMode(TachoPin, INPUT);  
+  digitalWrite(SENSOR_PIN, HIGH);
+  digitalWrite(INFLATOR_PIN, HIGH);
+#endif
 #endif
 
 
@@ -447,3 +455,98 @@ char* extruder::processCommand(char command[])
   }
   return reply; 
 }
+
+
+bool extruder::valveTimeCheck(int millisecs)
+{
+  if(valveAlreadyRunning)
+  {
+    long time = millis();
+    if(time > valveEndTime)
+    {
+      valveAlreadyRunning = false;
+      return true;
+    }
+    return false;
+  }
+
+  valveEndTime = millis() + millisecs*MILLI_CORRECTION;
+  valveAlreadyRunning = true;
+  return false;
+}
+ 
+bool extruder::stopValveFromMoving()
+{
+  if(valveMovement == VALVE_STOP)
+    return true;
+    
+  if(valveMovement == VALVE_FORWARD)
+    digitalWrite(H1D, 0);
+  else
+    digitalWrite(H1D, 1);
+    
+  digitalWrite(H1E, HIGH);
+  
+  if(!valveTimeCheck(MOTOR_REVERSE))
+    return false;
+    
+  digitalWrite(H1E, LOW);
+  valveState = requiredValveState;
+  valveMovement = VALVE_STOP;
+  return true;  
+}
+
+
+void extruder::setValveMotor()
+{
+  if(valveMovement == requiredValveMovement)
+    return;
+  
+  if(!stopValveFromMoving())
+    return;
+  
+  if(requiredValveMovement == VALVE_FORWARD)
+  {
+    digitalWrite(H1D, 1);
+    digitalWrite(H1E, HIGH);   
+    valveMovement = VALVE_FORWARD;
+  } else if(requiredValveMovement == VALVE_REVERSE)
+  {
+    digitalWrite(H1D, 0);    
+    digitalWrite(H1E, HIGH);
+    valveMovement = VALVE_REVERSE;
+  }  
+}
+
+void extruder::valveLoop()
+{
+  setValveMotor();
+    
+  if(valveState == requiredValveState)
+     return;
+  
+  if(digitalRead(TachoPin))
+   opto |= 1;
+  else
+   opto &= 0xfe; 
+   
+  if(valveOpto == 2)
+    requiredValveMovement = VALVE_STOP;
+  else
+  {
+      if(requiredValveState)
+        requiredValveMovement = VALVE_FORWARD;
+      else
+        requiredValveMovement = VALVE_REVERSE;    
+  }
+
+
+  
+  opto = (opto << 1) & 3;
+}
+
+
+   
+   
+
+

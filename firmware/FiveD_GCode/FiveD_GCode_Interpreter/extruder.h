@@ -6,7 +6,7 @@
 #ifndef EXTRUDER_H
 #define EXTRUDER_H
 
-#define EXTRUDER_COUNT 1
+
 
 void manageAllExtruders();
 
