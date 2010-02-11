@@ -75,7 +75,7 @@ volatile byte head;
 volatile byte tail;
 bool led;
 
-unsigned char interruptBlink;
+word interruptBlink;
 
 // Where the machine is from the point of view of the command stream
 
@@ -88,7 +88,7 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
   disableTimerInterrupt();
   
   interruptBlink++;
-  if(interruptBlink == 0x80)
+  if(interruptBlink == 0x280)
   {
      blink();
      interruptBlink = 0; 
@@ -111,6 +111,8 @@ void setup()
   pinMode(DEBUG_PIN, OUTPUT);
   debugstring[0] = 0;
   led = false;
+  
+  setupGcodeProcessor();
   
   ex[0] = &ex0;
 #if EXTRUDER_COUNT == 2  
@@ -180,6 +182,13 @@ void loop()
 //******************************************************************************************
 
 // The move buffer
+
+inline void cancelAndClearQueue()
+{
+	tail = head;	// clear buffer
+	for(int i=0;i<BUFFER_SIZE;i++)
+		cdda[i]->kill();
+}
 
 inline bool qFull()
 {

@@ -105,6 +105,10 @@ public:
   
   void set_units(bool using_mm);
   
+  // Kill - stop all activity and turn off steppers
+  
+  void kill();
+  
   // Record the selection of a new extruder
   
   //void set_extruder(extruder* ex);
