@@ -24,12 +24,6 @@
 #define TEMP_PID_IGAIN 0.1
 #define TEMP_PID_DGAIN 100.0
 
-// Valve controller definitions
-
-#define VALVE_FORWARD 2
-#define VALVE_STOP 0
-#define VALVE_REVERSE 1
-
 //******************************************************************************************************
 
 //our RS485 pins
@@ -119,9 +113,17 @@ private:
 #endif
 
 #ifdef PASTE_EXTRUDER
-  bool requiredValveState;
-  bool actualValveState;
-  byte 
+
+bool valveTimeCheck(int millisecs);
+bool valveAlreadyRunning;
+long valveEndTime;
+void valveTurn(bool close);
+bool valveAtEnd;
+bool seenHighLow;
+bool valveState;
+void valveMonitor();
+bool requiredValveState;
+
 #endif
 
    void waitForTemperature();

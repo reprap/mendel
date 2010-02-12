@@ -24,11 +24,7 @@ extruder::extruder()
   pinMode(TEMP_PIN, INPUT);
 
 #ifdef PASTE_EXTRUDER
-  pinMode(SENSOR_PIN, OUTPUT);
-  pinMode(INFLATOR_PIN, OUTPUT);
-  pinMode(TachoPin, INPUT);  
-  digitalWrite(SENSOR_PIN, HIGH);
-  digitalWrite(INFLATOR_PIN, HIGH);
+  pinMode(OPTO_PIN, INPUT);  
 #endif
 #endif
 
@@ -156,6 +152,8 @@ void extruder::manage()
     stp = s;
     sStep();
   }
+  
+  valveMonitor();
 
   manageCount++;
   if(manageCount > SLOW_CLOCK)
@@ -474,106 +472,43 @@ bool extruder::valveTimeCheck(int millisecs)
   return false;
 }
 
-void extruder::valveTurn(bool clockWise)
+void extruder::valveTurn(bool close)
 {
-  if(ValveAtEnd)
+  if(valveAtEnd)
     return;
-  if(clockWise)
+  if(close)
     digitalWrite(H1D, 1);
   else
     digitalWrite(H1D, 0);
   digitalWrite(H1E, HIGH);
-  if(!digitalRead(TachoPin))
+  if(!digitalRead(OPTO_PIN))
     seenHighLow = true;
   else
   {
     if(!seenHighLow) 
       return;
-    if(clockWise)
+    if(close)
       digitalWrite(H1D, 0);
     else
       digitalWrite(H1D, 1);
     if(!valveTimeCheck(20))
       return;
     digitalWrite(H1E, LOW);
+
+    valveState = close;
     valveAtEnd = true;
-    valveState = clockWise;
     seenHighLow = false; 
   }
 }
 
-
- 
-bool extruder::stopValveFromMoving()
+void extruder::valveMonitor()
 {
-  if(valveMovement == VALVE_STOP)
-    return true;
-    
-  if(valveMovement == VALVE_FORWARD)
-    digitalWrite(H1D, 0);
-  else
-    digitalWrite(H1D, 1);
-    
-  digitalWrite(H1E, HIGH);
-  
-  if(!valveTimeCheck(MOTOR_REVERSE))
-    return false;
-    
-  digitalWrite(H1E, LOW);
-  valveState = requiredValveState;
-  valveMovement = VALVE_STOP;
-  return true;  
-}
-
-
-void extruder::setValveMotor()
-{
-  if(valveMovement == requiredValveMovement)
-    return;
-  
-  if(!stopValveFromMoving())
-    return;
-  
-  if(requiredValveMovement == VALVE_FORWARD)
-  {
-    digitalWrite(H1D, 1);
-    digitalWrite(H1E, HIGH);   
-    valveMovement = VALVE_FORWARD;
-  } else if(requiredValveMovement == VALVE_REVERSE)
-  {
-    digitalWrite(H1D, 0);    
-    digitalWrite(H1E, HIGH);
-    valveMovement = VALVE_REVERSE;
-  }  
-}
-
-void extruder::valveLoop()
-{
-  setValveMotor();
-    
   if(valveState == requiredValveState)
-     return;
-  
-  if(digitalRead(TachoPin))
-   opto |= 1;
-  else
-   opto &= 0xfe; 
-   
-  if(valveOpto == 2)
-    requiredValveMovement = VALVE_STOP;
-  else
-  {
-      if(requiredValveState)
-        requiredValveMovement = VALVE_FORWARD;
-      else
-        requiredValveMovement = VALVE_REVERSE;    
-  }
-
-
-  
-  opto = (opto << 1) & 3;
-}
-
+    return;
+  valveAtEnd = false;
+  valveTurn(requiredValveState);
+}  
+ 
 
    
    
