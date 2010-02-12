@@ -114,15 +114,16 @@ private:
 
 #ifdef PASTE_EXTRUDER
 
-bool valveTimeCheck(int millisecs);
-bool valveAlreadyRunning;
-long valveEndTime;
-void valveTurn(bool close);
-bool valveAtEnd;
-bool seenHighLow;
-bool valveState;
-void valveMonitor();
-bool requiredValveState;
+  bool valveAlreadyRunning;
+  long valveEndTime;
+  bool valveAtEnd;
+  bool seenHighLow;
+  bool valveState;
+  bool requiredValveState;
+
+  bool valveTimeCheck(int millisecs);
+  void valveTurn(bool close);
+  void valveMonitor();
 
 #endif
 

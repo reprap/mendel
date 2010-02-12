@@ -24,7 +24,13 @@ extruder::extruder()
   pinMode(TEMP_PIN, INPUT);
 
 #ifdef PASTE_EXTRUDER
-  pinMode(OPTO_PIN, INPUT);  
+  pinMode(OPTO_PIN, INPUT); 
+  valveAlreadyRunning = false;
+  valveEndTime = 0;
+  valveAtEnd = false;
+  seenHighLow = false;
+  valveState = false;
+  requiredValveState = true;
 #endif
 #endif
 
@@ -152,8 +158,10 @@ void extruder::manage()
     stp = s;
     sStep();
   }
-  
+
+#ifdef PASTE_EXTRUDER
   valveMonitor();
+#endif
 
   manageCount++;
   if(manageCount > SLOW_CLOCK)
@@ -245,12 +253,11 @@ void extruder::waitForTemperature()
 
 }
 
-void extruder::valveSet(bool open)
+void extruder::valveSet(bool closed)
 {
-  if(open)
-    digitalWrite(OUTPUT_A, 1);
-  else
-    digitalWrite(OUTPUT_A, 0); 
+#ifdef PASTE_EXTRUDER
+  requiredValveState = closed;
+#endif
 }
 
 void extruder::setDirection(bool direction)
@@ -402,7 +409,7 @@ char* extruder::processCommand(char command[])
     break;
 
   case VALVE:
-    valveSet(command[1] == '1');
+    valveSet(command[1] != '1');
     break;
 
   case DIRECTION:
@@ -453,6 +460,8 @@ char* extruder::processCommand(char command[])
   }
   return reply; 
 }
+
+#ifdef PASTE_EXTRUDER
 
 bool extruder::valveTimeCheck(int millisecs)
 {
@@ -509,7 +518,7 @@ void extruder::valveMonitor()
   valveTurn(requiredValveState);
 }  
  
-
+#endif
    
    
 
