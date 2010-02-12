@@ -456,7 +456,6 @@ char* extruder::processCommand(char command[])
   return reply; 
 }
 
-
 bool extruder::valveTimeCheck(int millisecs)
 {
   if(valveAlreadyRunning)
@@ -474,6 +473,36 @@ bool extruder::valveTimeCheck(int millisecs)
   valveAlreadyRunning = true;
   return false;
 }
+
+void extruder::valveTurn(bool clockWise)
+{
+  if(ValveAtEnd)
+    return;
+  if(clockWise)
+    digitalWrite(H1D, 1);
+  else
+    digitalWrite(H1D, 0);
+  digitalWrite(H1E, HIGH);
+  if(!digitalRead(TachoPin))
+    seenHighLow = true;
+  else
+  {
+    if(!seenHighLow) 
+      return;
+    if(clockWise)
+      digitalWrite(H1D, 0);
+    else
+      digitalWrite(H1D, 1);
+    if(!valveTimeCheck(20))
+      return;
+    digitalWrite(H1E, LOW);
+    valveAtEnd = true;
+    valveState = clockWise;
+    seenHighLow = false; 
+  }
+}
+
+
  
 bool extruder::stopValveFromMoving()
 {

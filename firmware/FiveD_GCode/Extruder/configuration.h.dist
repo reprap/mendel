@@ -3,15 +3,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-// Comment out the next line if this extruder is extruding thermoplastic
-
-#define PASTE_EXTRUDER
-
-#ifdef PASTE_EXTRUDER
-#define MY_NAME '1'          // Two byte string representing the name of this device
-#else
-#define MY_NAME '0' 
-#endif
+#define MY_NAME '0'          // One byte string representing the name of this device
 
 #define RS485_MASTER 0       // We are a slave
 
@@ -26,6 +18,8 @@
 // Comment out the next line to give a bang-bang thermostat
 // Leave it for PID temperature control
 #define PID_CONTROL
+
+#define PASTE_EXTRUDER
 
 //******************************************************************************************************
 
@@ -82,12 +76,6 @@
 #define OUTPUT_C 12
 
 #define DEBUG_PIN 13
-
-#ifdef PASTE_EXTRUDER
-#define TachoPin 10 
-#define SENSOR_PIN 15
-#define INFLATOR_PIN 12
-#endif
 
 // The LED blink function
 

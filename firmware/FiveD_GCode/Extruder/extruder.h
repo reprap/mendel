@@ -32,22 +32,6 @@
 
 //******************************************************************************************************
 
-// Divide by this to correct for the fact that we have
-// messed up the timer clock
-
-#define MILLI_CORRECTION 64
-
-// The temperature routines get called each time the main loop
-// has gone round this many times
-
-#define SLOW_CLOCK 5000
-
-// Default PWM for the extruder stepper
-
-#define STEP_PWM 150
-
-// Pin defintion section.  This is for the RepRap Extruder Controler V2.2
-
 //our RS485 pins
 
 #define RX_ENABLE_PIN 4 
