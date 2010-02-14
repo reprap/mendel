@@ -20,7 +20,7 @@
 #define PID_CONTROL
 
 // Uncomment the next line if this is driving a paste extruder
-#define PASTE_EXTRUDER
+//#define PASTE_EXTRUDER
 
 //******************************************************************************************************
 

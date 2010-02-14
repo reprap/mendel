@@ -469,8 +469,7 @@ bool extruder::valveTimeCheck(int millisecs)
 {
   if(valveAlreadyRunning)
   {
-    long time = millis();
-    if(time > valveEndTime)
+    if(millis() >= valveEndTime)
     {
       valveAlreadyRunning = false;
       return true;
@@ -478,7 +477,8 @@ bool extruder::valveTimeCheck(int millisecs)
     return false;
   }
 
-  valveEndTime = millis() + millisecs*MILLI_CORRECTION;
+// MILLI_CORRECTION not needed here; makes time resolution too coarse
+  valveEndTime = millis() + millisecs; //*MILLI_CORRECTION;
   valveAlreadyRunning = true;
   return false;
 }
@@ -515,14 +515,14 @@ void extruder::valveTurn(bool close)
           return;
   
   case VALVE_STOPPING:
-/*          if(close)
+          if(close)
             digitalWrite(H1D, 0);
           else
             digitalWrite(H1D, 1);
             
-          if(!valveTimeCheck(20))
+          if(!valveTimeCheck(10))
             return;
-*/            
+            
           digitalWrite(H1E, LOW);
           valveState = close;
           valveAtEnd = true;
