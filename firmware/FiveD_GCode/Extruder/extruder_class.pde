@@ -22,18 +22,7 @@ extruder::extruder()
   digitalWrite(TC_0,HIGH);  // Disable MAX6675
 #else
   pinMode(TEMP_PIN, INPUT);
-
-#ifdef PASTE_EXTRUDER
-  pinMode(OPTO_PIN, INPUT); 
-  valveAlreadyRunning = false;
-  valveEndTime = 0;
-  valveAtEnd = false;
-  seenHighLow = false;
-  valveState = false;
-  requiredValveState = true;
 #endif
-#endif
-
 
   disableStep();
 
@@ -73,6 +62,17 @@ extruder::extruder()
   potSum = 0;
   potCount = 0;
   usePot = true;
+  
+#ifdef PASTE_EXTRUDER
+  pinMode(OPTO_PIN, INPUT); 
+  valveAlreadyRunning = false;
+  valveEndTime = 0;
+  valveAtEnd = false;
+  seenHighLow = false;
+  valveState = false;
+  requiredValveState = true;
+  kickStartValve();
+#endif
 }
 
 #ifdef  PID_CONTROL
@@ -257,6 +257,7 @@ void extruder::valveSet(bool closed)
 {
 #ifdef PASTE_EXTRUDER
   requiredValveState = closed;
+  kickStartValve();
 #endif
 }
 
@@ -282,6 +283,7 @@ int extruder::getTemperature()
 
 void extruder::sStep()
 {
+#ifndef PASTE_EXTRUDER
   byte pwm;
   
   if(usePot)
@@ -368,7 +370,7 @@ void extruder::sStep()
     break; 
 
   }
-
+#endif
 }
 
 
@@ -485,29 +487,51 @@ void extruder::valveTurn(bool close)
 {
   if(valveAtEnd)
     return;
-  if(close)
-    digitalWrite(H1D, 1);
-  else
-    digitalWrite(H1D, 0);
-  digitalWrite(H1E, HIGH);
-  if(!digitalRead(OPTO_PIN))
-    seenHighLow = true;
-  else
+    
+  byte valveRunningState = VALVE_STARTING;
+  if(digitalRead(OPTO_PIN))
   {
-    if(!seenHighLow) 
-      return;
-    if(close)
-      digitalWrite(H1D, 0);
+    seenHighLow = true;
+    valveRunningState = VALVE_RUNNING;
+  } else
+  {
+    if(!seenHighLow)
+     valveRunningState = VALVE_STARTING;
     else
-      digitalWrite(H1D, 1);
-    if(!valveTimeCheck(20))
-      return;
-    digitalWrite(H1E, LOW);
-
-    valveState = close;
-    valveAtEnd = true;
-    seenHighLow = false; 
-  }
+     valveRunningState = VALVE_STOPPING; 
+  }    
+   
+  switch(valveRunningState)
+  {
+  case VALVE_STARTING: 
+          if(close)
+             digitalWrite(H1D, 1);
+          else
+             digitalWrite(H1D, 0);
+          digitalWrite(H1E, HIGH);
+          break;
+          
+  case VALVE_RUNNING:
+          return;
+  
+  case VALVE_STOPPING:
+/*          if(close)
+            digitalWrite(H1D, 0);
+          else
+            digitalWrite(H1D, 1);
+            
+          if(!valveTimeCheck(20))
+            return;
+*/            
+          digitalWrite(H1E, LOW);
+          valveState = close;
+          valveAtEnd = true;
+          seenHighLow = false;
+          break;
+          
+  default:
+          break;
+  }  
 }
 
 void extruder::valveMonitor()
@@ -516,8 +540,19 @@ void extruder::valveMonitor()
     return;
   valveAtEnd = false;
   valveTurn(requiredValveState);
-}  
- 
+} 
+
+void extruder::kickStartValve()
+{
+  if(digitalRead(OPTO_PIN))
+  {
+     if(requiredValveState)
+       digitalWrite(H1D, 1);
+     else
+       digitalWrite(H1D, 0);
+     digitalWrite(H1E, HIGH);    
+  }
+} 
 #endif
    
    
