@@ -51,7 +51,7 @@ void extruder::waitForTemperature()
     if(count > 5)
     {
       newT = newT/5;
-      if(newT >= target_celcius - HALF_DEAD_ZONE)
+      if(newT >= target_celsius - HALF_DEAD_ZONE)
       {
         warming = false;
         if(seconds > WAIT_AT_TEMPERATURE)

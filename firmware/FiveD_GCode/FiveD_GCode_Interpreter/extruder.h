@@ -164,7 +164,7 @@ public:
 private:
 
    char my_name;
-   int target_celcius;
+   int target_celsius;
    int count;
    int oldT, newT;
    char commandBuffer[RS485_BUF_LEN];
@@ -229,7 +229,7 @@ inline  void extruder::setCooler(byte e_speed)
 
 inline  void extruder::setTemperature(int temp)
 {
-   target_celcius = temp;
+   target_celsius = temp;
    buildNumberCommand(SET_T, temp);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer); 
 }
