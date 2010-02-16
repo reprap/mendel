@@ -98,7 +98,8 @@ FloatPoint where_i_am;
 
 // Our interrupt function
 
-SIGNAL(SIG_OUTPUT_COMPARE1A)
+//SIGNAL(SIG_OUTPUT_COMPARE1A)
+ISR(TIMER1_COMPA_vect)
 {
   disableTimerInterrupt();
   
