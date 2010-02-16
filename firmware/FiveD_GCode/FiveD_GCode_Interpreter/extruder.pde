@@ -215,7 +215,7 @@ void extruder::setTemperature(int temp)
 int extruder::getTemperature()
 {
 #ifdef USE_THERMISTOR
-  int raw = sample_temperature(temp_pin);
+  int raw = sampleTemperature();
 
   int celsius = 0;
   byte i;
