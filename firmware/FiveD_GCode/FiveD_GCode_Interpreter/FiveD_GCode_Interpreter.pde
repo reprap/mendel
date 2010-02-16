@@ -1,3 +1,18 @@
+
+/**
+
+RepRap GCode interpreter.
+
+IMPORTANT
+
+Before changing this interpreter, read this page:
+
+http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
+
+*/
+
+
+
 // Yep, this is actually -*- c++ -*-
 
 // Sanguino G-code Interpreter
