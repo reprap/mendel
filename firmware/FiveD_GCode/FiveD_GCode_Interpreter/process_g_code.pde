@@ -522,6 +522,7 @@ void process_string(char instruction[], int size)
 				ex[extruder_in_use]->setCooler(0);
 				break;
 
+/*  Now all done with M113
 			//set PWM to extruder stepper
 			case 108:
 #if MOTHERBOARD > 1
@@ -529,6 +530,7 @@ void process_string(char instruction[], int size)
                                         ex[extruder_in_use]->setPWM((int)(255.0*gc.S + 0.5));
 #endif
 				break;
+*/
 
                         // Set the temperature and wait for it to get there
 			case 109:
@@ -556,10 +558,14 @@ void process_string(char instruction[], int size)
 				cancelAndClearQueue();
 				break;
 
+// If there's an S field, use that to set the PWM, otherwise use the pot.
                        case 113:
-                            #if MOTHERBOARD > 1
-                                ex[extruder_in_use]->usePotForMotor();
-                            #endif
+                                #if MOTHERBOARD > 1
+                                 if (gc.seen & GCODE_S)
+                                     ex[extruder_in_use]->setPWM((int)(255.0*gc.S + 0.5));
+                                  else
+                                     ex[extruder_in_use]->usePotForMotor();
+                                #endif
 				break;
 
 
