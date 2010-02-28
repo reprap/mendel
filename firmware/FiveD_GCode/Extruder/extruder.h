@@ -99,7 +99,7 @@ private:
    void setTemperature(int t);
    int getTemperature();
    void controlTemperature();
-   void sStep();
+   void sStep(byte dir);
    void enableStep();
    void disableStep();
    int potVoltage();

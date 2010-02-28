@@ -37,6 +37,13 @@ void setup()
   pinMode(DEBUG_PIN, OUTPUT);
   rs485Interface.begin(RS485_BAUD);
   blk = 0;
+  
+  // Change the frequency of Timer 0 so that PWM on pins H1E and H2E goes at
+  // a very high frequency (64kHz see: 
+  // http://tzechienchu.typepad.com/tc_chus_point/2009/05/changing-pwm-frequency-on-the-arduino-diecimila.html)
+
+  //TCCR0B &= ~(0x07); 
+  //TCCR0B |= 1;
 } 
 
 void loop() 

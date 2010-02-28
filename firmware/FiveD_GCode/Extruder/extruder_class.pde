@@ -25,13 +25,6 @@ extruder::extruder()
 #endif
 
   disableStep();
-
-  // Change the frequency of Timer 0 so that PWM on pins H1E and H2E goes at
-  // a very high frequency (64kHz see: 
-  // http://tzechienchu.typepad.com/tc_chus_point/2009/05/changing-pwm-frequency-on-the-arduino-diecimila.html)
-
-  TCCR0B &= ~(0x07); 
-  TCCR0B |= 1;
  
 #ifdef  PID_CONTROL
 
@@ -156,7 +149,7 @@ void extruder::manage()
   if(s != stp)
   {
     stp = s;
-    sStep();
+    sStep(0);
   }
 
 #ifdef PASTE_EXTRUDER
@@ -281,7 +274,7 @@ int extruder::getTemperature()
   return currentTemperature;  
 }
 
-void extruder::sStep()
+void extruder::sStep(byte dir)
 {
 #ifndef PASTE_EXTRUDER
   byte pwm;
@@ -293,10 +286,24 @@ void extruder::sStep()
 
   // This increments or decrements coilPosition then writes the appropriate pattern to the output pins.
 
-  if(digitalRead(E_DIR_PIN))
-    coilPosition++;
-  else
-    coilPosition--;
+  switch(dir)
+  {
+    case 1:
+      coilPosition++;
+      break;
+      
+    case 2:
+      coilPosition--;
+      break;
+      
+    default:
+      if(digitalRead(E_DIR_PIN))
+        coilPosition++;
+      else
+        coilPosition--;
+      break;
+  }
+  
   coilPosition &= 7;
 
   // Which of the 8 possible patterns do we want?
@@ -394,11 +401,15 @@ void extruder::setPWM(int p)
 {
   pwmValue = p;
   usePot = false;
+  sStep(1);
+  sStep(2);
 }
 
 void extruder::usePotForMotor()
 {
   usePot = true;
+  sStep(1);
+  sStep(2);
 }
 
 char* extruder::processCommand(char command[])
@@ -431,7 +442,7 @@ char* extruder::processCommand(char command[])
     break;
 
   case STEP:
-    //sStep(); // Now handled by hardware.
+    //sStep(0); // Now handled by hardware.
     break;
 
   case ENABLE:
