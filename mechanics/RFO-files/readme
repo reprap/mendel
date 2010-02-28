@@ -2,3 +2,8 @@ The files in here are a set of RFO files that can be loaded into the Java Host s
 (see http://objects.reprap.org/wiki/Mendel_User_Manual:_Host_Software) to allow GCodes 
 to be generated.  These will make a RepRap Version II "Mendel" print all the reprapped 
 parts needed to make another Mendel.
+
+The contents of the trays are listed in the Mendel-m4-assembly-data-sheet.ods spreadsheet 
+which is here:
+
+http://objects.reprap.org/wiki/Mendel_assembly_data_sheet
