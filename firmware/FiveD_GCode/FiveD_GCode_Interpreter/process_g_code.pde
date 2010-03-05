@@ -568,7 +568,17 @@ void process_string(char instruction[], int size)
                                 #endif
 				break;
 
-
+			//custom code for returning current coordinates
+			case 114:
+				Serial.print("C: X");
+                                Serial.print(where_i_am.x);
+                                Serial.print(" Y");
+                                Serial.print(where_i_am.y);
+                                Serial.print(" Z");
+                                Serial.print(where_i_am.z);
+                                Serial.print(" E");
+                                Serial.println(where_i_am.e);
+				break;
 
 // The valve (real, or virtual...) is now the way to control any extruder (such as
 // a pressurised paste extruder) that cannot move using E codes.
