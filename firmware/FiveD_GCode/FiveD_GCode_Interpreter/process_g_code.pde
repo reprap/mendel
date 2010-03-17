@@ -118,6 +118,42 @@ inline void specialMoveZ(const float& z, const float& feed)
   qMove(sp);
 }
 
+void zeroX()
+{
+  where_i_am.f = SLOW_XY_FEEDRATE;
+  specialMoveX(where_i_am.x - 5, FAST_XY_FEEDRATE);
+  specialMoveX(where_i_am.x - 250, FAST_XY_FEEDRATE);
+  where_i_am.x = 0;
+  where_i_am.f = SLOW_XY_FEEDRATE;
+  specialMoveX(where_i_am.x + 1, SLOW_XY_FEEDRATE);
+  specialMoveX(where_i_am.x - 10, SLOW_XY_FEEDRATE);                                
+  where_i_am.x = 0;  
+}
+
+void zeroY()
+{
+  specialMoveY(where_i_am.y - 5, FAST_XY_FEEDRATE);
+  specialMoveY(where_i_am.y - 250, FAST_XY_FEEDRATE);
+  where_i_am.y = 0;
+  where_i_am.f = SLOW_XY_FEEDRATE;
+  specialMoveY(where_i_am.y + 1, SLOW_XY_FEEDRATE);
+  specialMoveY(where_i_am.y - 10, SLOW_XY_FEEDRATE);                                
+  where_i_am.y = 0; 
+   
+}
+
+void zeroZ()
+{
+  where_i_am.f = SLOW_Z_FEEDRATE;
+  specialMoveZ(where_i_am.z - 0.5, FAST_Z_FEEDRATE);
+  specialMoveZ(where_i_am.z - 250, FAST_Z_FEEDRATE);
+  where_i_am.z = 0;
+  where_i_am.f = SLOW_Z_FEEDRATE;
+  specialMoveZ(where_i_am.z + 1, SLOW_Z_FEEDRATE);
+  specialMoveZ(where_i_am.z - 2, SLOW_Z_FEEDRATE);                                
+  where_i_am.z = 0;  
+}
+
 //our feedrate variables.
 //float feedrate = SLOW_XY_FEEDRATE;
 
@@ -255,6 +291,7 @@ void process_string(char instruction[], int size)
 		return;
 
         float fr;
+        bool axisSelected;
         
 	fp.x = 0.0;
 	fp.y = 0.0;
@@ -362,44 +399,41 @@ void process_string(char instruction[], int size)
                                 fp.f = fr;
                                 return;
                                 
-                        // Controlled move
+                        // Controlled move; -ve coordinate means zero the axis
 			case 1:
-                                qMove(fp);
-                                return;
+                                 qMove(fp);
+                                 return;                                  
                                 
-                        //go home.
+                        //go home.  If we send coordinates (regardless of their value) only zero those axes
 			case 28:
-                                where_i_am.f = SLOW_XY_FEEDRATE;
-                                specialMoveX(where_i_am.x - 5, FAST_XY_FEEDRATE);
-                                specialMoveX(where_i_am.x - 250, FAST_XY_FEEDRATE);
-                                where_i_am.x = 0;
-                                where_i_am.f = SLOW_XY_FEEDRATE;
-                                specialMoveX(where_i_am.x + 1, SLOW_XY_FEEDRATE);
-                                specialMoveX(where_i_am.x - 10, SLOW_XY_FEEDRATE);                                
-                                where_i_am.x = 0;
-                                
-                                specialMoveY(where_i_am.y - 5, FAST_XY_FEEDRATE);
-                                specialMoveY(where_i_am.y - 250, FAST_XY_FEEDRATE);
-                                where_i_am.y = 0;
-                                where_i_am.f = SLOW_XY_FEEDRATE;
-                                specialMoveY(where_i_am.y + 1, SLOW_XY_FEEDRATE);
-                                specialMoveY(where_i_am.y - 10, SLOW_XY_FEEDRATE);                                
-                                where_i_am.y = 0; 
- 
-                                where_i_am.f = SLOW_Z_FEEDRATE;
-                                specialMoveZ(where_i_am.z - 0.5, FAST_Z_FEEDRATE);
-                                specialMoveZ(where_i_am.z - 250, FAST_Z_FEEDRATE);
-                                where_i_am.z = 0;
-                                where_i_am.f = SLOW_Z_FEEDRATE;
-                                specialMoveZ(where_i_am.z + 1, SLOW_Z_FEEDRATE);
-                                specialMoveZ(where_i_am.z - 2, SLOW_Z_FEEDRATE);                                
-                                where_i_am.z = 0;
+                                axisSelected = false;
+                                if(gc.seen & GCODE_X)
+                                {
+                                  zeroX();
+                                  axisSelected = true;
+                                }
+                                if(gc.seen & GCODE_Y)
+                                {
+                                  zeroY();
+                                  axisSelected = true;
+                                }                                
+                                if(gc.seen & GCODE_Z)
+                                {
+                                  zeroZ();
+                                  axisSelected = true;
+                                }
+                                if(!axisSelected)
+                                {
+                                  zeroX();
+                                  zeroY();
+                                  zeroZ();
+                                }
                                 where_i_am.f = SLOW_XY_FEEDRATE;     // Most sensible feedrate to leave it in                    
 
 				return;
 
 
-                  default:
+                          default:
                                 break;
                 }
                 

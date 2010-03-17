@@ -6,14 +6,7 @@
  */
  
 
- /*
- ***NOTE*** 
- This program changes the frequency of Timer 0 so that PWM on pins H1E and H2E goes at
- a very high frequency (64kHz see: 
- http://tzechienchu.typepad.com/tc_chus_point/2009/05/changing-pwm-frequency-on-the-arduino-diecimila.html)
- This will mess up timings in the delay() and similar functions; they will no longer work in
- milliseconds, but 64 times faster.
- */
+ 
   
 #ifndef __AVR_ATmega168__
 #error Oops!  Make sure you have 'Arduino Diecimila' selected from the boards menu.
@@ -42,8 +35,10 @@ void setup()
   // a very high frequency (64kHz see: 
   // http://tzechienchu.typepad.com/tc_chus_point/2009/05/changing-pwm-frequency-on-the-arduino-diecimila.html)
 
-  //TCCR0B &= ~(0x07); 
-  //TCCR0B |= 1;
+#ifdef FAST_PWM
+  TCCR0B &= ~(0x07); 
+  TCCR0B |= 1;
+#endif
 } 
 
 void loop() 

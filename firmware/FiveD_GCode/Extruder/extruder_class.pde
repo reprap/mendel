@@ -488,8 +488,7 @@ bool extruder::valveTimeCheck(int millisecs)
     return false;
   }
 
-// MILLI_CORRECTION not needed here; makes time resolution too coarse
-  valveEndTime = millis() + millisecs; //*MILLI_CORRECTION;
+  valveEndTime = millis() + millisecs*MILLI_CORRECTION;
   valveAlreadyRunning = true;
   return false;
 }
