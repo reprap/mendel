@@ -168,6 +168,43 @@ void setup()
   enableTimerInterrupt();
 }
 
+// This does a hard stop.  It disables interrupts, turns off all the motors 
+// (regardless of DISABLE_X etc), and calls extruder.shutdown() for each
+// extruder.  It then spins in an endless loop, never returning.  The only
+// way out is to press the reset button.
+
+void shutdown()
+{
+  // No more stepping
+  
+  disableTimerInterrupt();
+  
+  // Delete everything in the ring buffer
+  
+  cancelAndClearQueue();
+  
+  // LED off
+  
+  digitalWrite(DEBUG_PIN, 0);
+
+  // Motors off
+  
+#if MOTHERBOARD > 0  
+  digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
+  digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
+  digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
+#endif
+
+  // Stop the extruders
+  
+  for(byte i = 0; i < EXTRUDER_COUNT; i++)
+    ex[i]->shutdown();
+  
+  // Till the end of time...
+  
+  for(;;); 
+}
+
 //long count = 0;
 //int ct1 = 0;
 
@@ -178,21 +215,6 @@ void loop()
 #if MOTHERBOARD > 1
    talker.tick();
 #endif
-/*
-  count++;
-  if(count > 1000)
-  {
-    ct1++;
-    ex[0]->step();
-    if(!ex[0]->ping())
-    {
-      Serial.print(ct1);
-      Serial.println(debugstring);
-      debugstring[0] = 0;
-    }
-    count = 0;
-  }
-*/
 }
 
 //******************************************************************************************

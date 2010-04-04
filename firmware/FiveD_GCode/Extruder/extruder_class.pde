@@ -241,6 +241,18 @@ int extruder::internalTemperature()
 
 }
 
+// Stop everything
+
+void extruder::shutdown()
+{
+  // Heater off;
+  setTemperature(0);
+  // Motor off
+  disableStep();
+  // Close valve
+  valveSet(true);
+}
+
 void extruder::waitForTemperature()
 {
 
@@ -463,6 +475,10 @@ char* extruder::processCommand(char command[])
 
   case UPFM:
     usePotForMotor();
+    break;
+  
+  case SHUT:
+    shutdown();
     break;  
 
   case PING:

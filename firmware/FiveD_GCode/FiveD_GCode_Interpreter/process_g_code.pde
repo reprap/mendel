@@ -354,6 +354,12 @@ void process_string(char instruction[], int size)
 		gc.G = last_gcode_g;
 		gc.seen |= GCODE_G;
 	}
+
+        // Deal with emergency stop as No 1 priority
+        
+        if ((gc.seen & GCODE_M) && (gc.M == 112))
+            shutdown();
+        
 	//did we get a gcode?
 	if (gc.seen & GCODE_G)
   	{
@@ -496,14 +502,12 @@ void process_string(char instruction[], int size)
             //delay(2*WAITING_DELAY);
 		switch (gc.M)
 		{
-			//TODO: this is a bug because search_string returns 0.  gotta fix that.
+			
+                        
 			case 0:
+                                shutdown();
 				break;
 				/*
-				 case 0:
-				 //todo: stop program
-				 break;
-
 				 case 1:
 				 //todo: optional stop
 				 break;

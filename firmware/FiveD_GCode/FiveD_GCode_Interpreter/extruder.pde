@@ -159,6 +159,12 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
   setTemperature(target_celsius);
 }
 
+void extruder::shutdown()
+{
+  analogWrite(heater_pin, 0); 
+  digitalWrite(step_en_pin, !ENABLE_ON);
+  valveSet(false, 500);
+}
 
 
 /*

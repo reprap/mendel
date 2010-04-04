@@ -15,6 +15,7 @@
 #define PREAD 'R'         // read the pot voltage
 #define SPWM 'M'          // Set the motor PWM
 #define UPFM 'U'          // Use the pot to control the motor
+#define SHUT 'X'          // Hard stop
 #define PING 'P'          // Just acknowledge
 
 // PID definitions
@@ -104,7 +105,8 @@ private:
    void disableStep();
    int potVoltage();
    void setPWM(int p);
-   void usePotForMotor(); 
+   void usePotForMotor();
+   void shutdown(); 
 };
 
 
