@@ -32,6 +32,35 @@
 
 //******************************************************************************************************
 
+class PIDcontrol
+{
+  
+private:
+
+  volatile int iState; // Integrator state
+  volatile int dState; // Last position input
+  unsigned long previousTime; // ms
+  unsigned long time;
+  int dt;
+  float pGain;
+  float iGain;
+  float dGain;
+  int temp_dState;
+  long temp_iState;
+  float temp_iState_max;
+  float temp_iState_min;
+  int output;
+  int error;
+  float pTerm, iTerm, dTerm;
+  byte pin;
+  
+public:
+
+  PIDcontrol(byte p);
+  void pidCalculation(int target, int current);
+  
+};
+
 
 class extruder
 {
@@ -54,26 +83,13 @@ private:
    byte stp;         // Tracks the step signal
    int  targetTemperature;        // Target temperature in C
    int  currentTemperature;           // Current temperature in C
+   int  targetBedTemperature;        // Target bed temperature in C
+   int  currentBedTemperature;           // Current bed temperature in C   
    int  manageCount; // Timing in the manage function
    bool forward;     // Extrude direction
    char reply[REPLY_LENGTH];  // For sending messages back
-   
-#ifdef PID_CONTROL
-
-  volatile int iState; // Integrator state
-  volatile int dState; // Last position input
-  unsigned long previousTime; // ms
-  float pGain;
-  float iGain;
-  float dGain;
-  int temp_dState;
-  long temp_iState;
-  float temp_iState_max;
-  float temp_iState_min;
-
-  byte pidCalculation(int dt);
-
-#endif
+   PIDcontrol* extruderPID;    // Temperature control - extruder...
+   PIDcontrol* bedPID;         // ... and bed (if any).
 
 #ifdef PASTE_EXTRUDER
 
@@ -98,7 +114,9 @@ private:
    void setDirection(bool direction);
    void setCooler(byte e_speed);
    void setTemperature(int t);
+   void setBedTemperature(int t);
    int getTemperature();
+   int getBedTemperature();
    void controlTemperature();
    void sStep(byte dir);
    void enableStep();

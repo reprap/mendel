@@ -23,6 +23,10 @@
 
 extruder ex;
 intercom talker(&ex);
+
+static PIDcontrol ePID(HEATER_OUTPUT);
+static PIDcontrol bPID(BED_OUTPUT);
+  
 byte blk;
 
 void setup() 

@@ -15,10 +15,6 @@
 //#define AD595_THERMOCOUPLE
 //#define MAX6675_THERMOCOUPLE
 
-// Comment out the next line to give a bang-bang thermostat
-// Leave it for PID temperature control
-#define PID_CONTROL
-
 // Uncomment the next line if this is driving a paste extruder
 //#define PASTE_EXTRUDER
 
@@ -92,9 +88,9 @@
 
 // MOSFET drivers
 
-#define OUTPUT_A 15
-#define OUTPUT_B 11
-#define OUTPUT_C 12
+#define BED_OUTPUT 15
+#define FAN_OUTPUT 11
+#define HEATER_OUTPUT 12
 
 #define DEBUG_PIN 13
 

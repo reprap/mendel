@@ -3,15 +3,61 @@
 #include "extruder.h"
 #include "temperature.h"
 
+// With thanks to Adam at Makerbot and Tim at BotHacker
+// see http://blog.makerbot.com/2009/10/01/open-source-ftw/
+
+PIDcontrol::PIDcontrol(byte p)
+{
+   pin = p;
+   pGain = TEMP_PID_PGAIN;
+   iGain = TEMP_PID_IGAIN;
+   dGain = TEMP_PID_DGAIN;
+   temp_iState = 0;
+   temp_dState = 0;
+   temp_iState_min = -TEMP_PID_INTEGRAL_DRIVE_MAX/iGain;
+   temp_iState_max = TEMP_PID_INTEGRAL_DRIVE_MAX/iGain;
+   iState = 0;
+   dState = 0;
+   previousTime = millis()/MILLI_CORRECTION;
+   output = 0; 
+}
+
+void PIDcontrol::pidCalculation(int target, int current)
+{
+  time = millis()/MILLI_CORRECTION;  // Correct for fast clock
+  dt = time - previousTime;
+  previousTime = time;
+  if (dt <= 0) // Don't do it when millis() has rolled over
+    return;
+    
+  error = target - current;
+
+  pTerm = pGain * error;
+
+  temp_iState += error;
+  temp_iState = constrain(temp_iState, temp_iState_min, temp_iState_max);
+  iTerm = iGain * temp_iState;
+
+  dTerm = dGain * (current - temp_dState);
+  temp_dState = current;
+
+  output = pTerm + iTerm - dTerm;
+  output = constrain(output, 0, 255);
+  
+  analogWrite(pin, output);
+}
+
+
+
 extruder::extruder()
 {
   pinMode(H1D, OUTPUT);
   pinMode(H1E, OUTPUT);  
   pinMode(H2D, OUTPUT);
   pinMode(H2E, OUTPUT);
-  pinMode(OUTPUT_A, OUTPUT);
-  pinMode(OUTPUT_B, OUTPUT);
-  pinMode(OUTPUT_C, OUTPUT);
+  pinMode(HEATER_OUTPUT, OUTPUT);
+  pinMode(FAN_OUTPUT, OUTPUT);
+  pinMode(BED_OUTPUT, OUTPUT);
   pinMode(E_STEP_PIN, INPUT);
   pinMode(E_DIR_PIN, INPUT);  
   pinMode(POT, INPUT);
@@ -26,20 +72,8 @@ extruder::extruder()
 
   disableStep();
  
-#ifdef  PID_CONTROL
-
-   pGain = TEMP_PID_PGAIN;
-   iGain = TEMP_PID_IGAIN;
-   dGain = TEMP_PID_DGAIN;
-   temp_iState = 0;
-   temp_dState = 0;
-   temp_iState_min = -TEMP_PID_INTEGRAL_DRIVE_MAX/iGain;
-   temp_iState_max = TEMP_PID_INTEGRAL_DRIVE_MAX/iGain;
-   iState = 0;
-   dState = 0;
-   previousTime = millis()/MILLI_CORRECTION;
-
-#endif
+  extruderPID = &ePID;
+  bedPID = &bPID;
  
 
   // Defaults
@@ -49,6 +83,8 @@ extruder::extruder()
   pwmValue =  STEP_PWM;
   targetTemperature = 0;
   currentTemperature = 0;
+  targetBedTemperature = 0;
+  currentBedTemperature = 0;
   manageCount = 0;
   stp = 0;
   potVal = 0;
@@ -68,59 +104,22 @@ extruder::extruder()
 #endif
 }
 
-#ifdef  PID_CONTROL
-
-// With thanks to Adam at Makerbot and Tim at BotHacker
-// see http://blog.makerbot.com/2009/10/01/open-source-ftw/
-
-byte extruder::pidCalculation(int dt)
-{
-  int output;
-  int error;
-  float pTerm, iTerm, dTerm;
-
-  error = targetTemperature - currentTemperature;
-
-  pTerm = pGain * error;
-
-  temp_iState += error;
-  temp_iState = constrain(temp_iState, temp_iState_min, temp_iState_max);
-  iTerm = iGain * temp_iState;
-
-  dTerm = dGain * (currentTemperature - temp_dState);
-  temp_dState = currentTemperature;
-
-  output = pTerm + iTerm - dTerm;
-  output = constrain(output, 0, 255);
-
-  return output;
-}
-
-#endif
 
 void extruder::controlTemperature()
 {
-  currentTemperature = internalTemperature(); 
-    
-#ifdef PID_CONTROL
+  currentTemperature = internalTemperature();     
+  extruderPID->pidCalculation(targetTemperature, currentTemperature);
+  bedPID->pidCalculation(targetBedTemperature, currentBedTemperature);
 
-  int dt;
-  unsigned long time = millis()/MILLI_CORRECTION;  // Correct for fast clock
-  dt = time - previousTime;
-  previousTime = time;
-  if (dt > 0) // Don't do it when millis() has rolled over
-    analogWrite(OUTPUT_C, pidCalculation(dt));
-
-#else
 
   // Simple bang-bang temperature control
 
-  if(targetTemperature > currentTemperature)
-    digitalWrite(OUTPUT_C, 1);
-  else
-    digitalWrite(OUTPUT_C, 0);
+//  if(targetTemperature > currentTemperature)
+//    digitalWrite(HEATER_OUTPUT, 1);
+//  else
+//    digitalWrite(HEATER_OUTPUT, 0);
 
-#endif 
+ 
 }
 
 
@@ -273,7 +272,7 @@ void extruder::setDirection(bool direction)
 
 void extruder::setCooler(byte e_speed)
 {
-  analogWrite(OUTPUT_B, e_speed);   
+  analogWrite(FAN_OUTPUT, e_speed);   
 }
 
 void extruder::setTemperature(int tp)
