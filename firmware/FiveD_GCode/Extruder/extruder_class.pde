@@ -193,8 +193,8 @@ int extruder::internalTemperature()
   // Overflow: Set to last value in the table
   if (i == NUMTEMPS) celsius = temptable[i-1][1];
   // Clamp to byte
-  if (celsius > 255) celsius = 255; 
-  else if (celsius < 0) celsius = 0; 
+  //if (celsius > 255) celsius = 255; 
+  //else if (celsius < 0) celsius = 0; 
 
   return celsius;
 #endif

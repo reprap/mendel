@@ -61,11 +61,11 @@ private:
   
   // Can this axis step?
   
-  bool can_step(int min_pin, int max_pin, long current, long target, bool dir);
+  bool can_step(int min_pin, int max_pin, long current, long target, bool dir, bool inv);
   
   // Read a limit switch
   
-  bool read_switch(byte pin);
+  bool read_switch(byte pin, bool inv);
   
   // Work out the number of microseconds between steps
   
@@ -164,15 +164,14 @@ inline long cartesian_dda::calculate_feedrate_delay(const float& feedrate)
 	return round( (distance*60000000.0) / (feedrate*(float)total_steps) );	
 }
 
-inline bool cartesian_dda::read_switch(byte pin)
+inline bool cartesian_dda::read_switch(byte pin, bool inv)
 {
 	//dual read as crude debounce
 
-	#if ENDSTOPS_INVERTING == 1
+	if(inv)
 		return !digitalRead(pin) && !digitalRead(pin);
-	#else
+	else
 		return digitalRead(pin) && digitalRead(pin);
-	#endif
 }
 
 #endif
