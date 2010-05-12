@@ -16,6 +16,7 @@
 #include <HardwareSerial.h>
 #include "WProgram.h"
 #include "configuration.h"
+#include "temperature.h"
 #include "extruder.h"
 #include "intercom.h"
 
@@ -24,8 +25,8 @@
 extruder ex;
 intercom talker(&ex);
 
-static PIDcontrol ePID(HEATER_OUTPUT);
-static PIDcontrol bPID(BED_OUTPUT);
+static PIDcontrol ePID(HEATER_OUTPUT, TEMP_PIN, false);
+static PIDcontrol bPID(BED_OUTPUT, BED_TEMP_PIN, true);
   
 byte blk;
 

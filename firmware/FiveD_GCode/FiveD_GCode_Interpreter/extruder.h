@@ -135,6 +135,8 @@ inline void extruder::setCooler(byte sp)
 #define COOL 'C'          // set_cooler(byte e_speed);
 #define SET_T 'T'         // set_temperature(int temp);
 #define GET_T 't'         // get_temperature();
+#define SET_BED_T 'B'     // set bed temperature(int temp);
+#define GET_BED_T 'b'     // get bed temperature();
 #define STEP 'S'          // step();
 #define ENABLE 'E'        // enableStep();
 #define DISABLE 'e'       // disableStep();
@@ -154,6 +156,8 @@ public:
    void setDirection(bool direction);
    void setCooler(byte e_speed);
    void setTemperature(int temp);
+   int getBedTemperature();
+   void setBedTemperature(int temp);
    int getTemperature();
    void manage();
    void sStep();
@@ -241,6 +245,20 @@ inline  void extruder::setTemperature(int temp)
 inline  int extruder::getTemperature()
 {
    buildCommand(GET_T);
+   char* reply = talker.sendPacketAndGetReply(my_name, commandBuffer);
+   return(atoi(reply));
+}
+
+inline  void extruder::setBedTemperature(int temp)
+{
+   target_celsius = temp;
+   buildNumberCommand(SET_BED_T, temp);
+   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer); 
+}
+
+inline  int extruder::getBedTemperature()
+{
+   buildCommand(GET_BED_T);
    char* reply = talker.sendPacketAndGetReply(my_name, commandBuffer);
    return(atoi(reply));
 }

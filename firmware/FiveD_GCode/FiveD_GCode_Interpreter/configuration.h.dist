@@ -1,5 +1,5 @@
-#ifndef PARAMETERS_H
-#define PARAMETERS_H
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
 
 /*
  *  This is the configuration file for the RepRap Motherboard microcontroller.
@@ -41,7 +41,9 @@
 // RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
 // are inverting.
 
-#define ENDSTOPS_INVERTING 0
+#define X_ENDSTOP_INVERTING false
+#define Y_ENDSTOP_INVERTING false
+#define Z_ENDSTOP_INVERTING false
 
 //**********************************************************************************************
 
@@ -62,7 +64,14 @@
 // RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
 // are inverting.
 
-#define ENDSTOPS_INVERTING 1
+#define X_ENDSTOP_INVERTING true
+#define Y_ENDSTOP_INVERTING true
+#define Z_ENDSTOP_INVERTING true
+
+// Does your machine have the older standard slotted pullyes (needing lots of motor shaft filing)
+// or the newer pulleys with grub screws?  Uncomment one of the two next lines.
+//#define SLOTTED_PULLEYS
+#define GRUB_PULLEYS
 
 #define MY_NAME 'H'           // Byte representing the name of this device
 #define E0_NAME '0'           // Byte representing the name of extruder 0
@@ -103,7 +112,8 @@
 
 #ifdef MENDEL
 
-// define the XYZ parameters of Mendel
+#ifdef SLOTTED_PULLEYS
+// define the XYZ parameters of Mendel - standard pulleys
 
 #define X_STEPS_PER_MM   10.047
 #define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
@@ -116,6 +126,23 @@
 #define Z_STEPS_PER_MM   833.398
 #define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Z_DIR 0
+#endif
+
+#ifdef GRUB_PULLEYS
+// define the XYZ parameters of Mendel - grub-screw pulleys
+
+#define X_STEPS_PER_MM   10.047
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   10.047
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   833.398
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Z_DIR 0
+#endif
 
 #else
 
@@ -139,10 +166,10 @@
 // E_STEPS_PER_MM is the number of steps needed to 
 // extrude 1mm out of the nozzle.
 
-#define E_STEPS_PER_MM   0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+//#define E_STEPS_PER_MM   0.9 //0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
 
 //#define E_STEPS_PER_MM   2.2       // NEMA 14 geared extruder 8mm diameter drive
-//#define E_STEPS_PER_MM   2.0       // NEMA 17 55/11 geared extruder 8mm diameter drive
+#define E_STEPS_PER_MM   1.8       // NEMA 17 55/11 geared extruder 8mm diameter drive
 
 #define E_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM) // *RO
 

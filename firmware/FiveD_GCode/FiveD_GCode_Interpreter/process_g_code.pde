@@ -547,7 +547,9 @@ void process_string(char instruction[], int size)
 			//custom code for temperature reading
 			case 105:
 				Serial.print("T:");
-				Serial.println(ex[extruder_in_use]->getTemperature());
+				Serial.print(ex[extruder_in_use]->getTemperature());
+                                Serial.print(" B:");
+                                Serial.println(ex[0]->getBedTemperature());
 				break;
 
 			//turn fan on
@@ -617,6 +619,18 @@ void process_string(char instruction[], int size)
                                 Serial.print(" E");
                                 Serial.println(where_i_am.e);
 				break;
+
+                        case 115:
+				if (gc.seen & GCODE_S)
+				{
+					ex[0]->setBedTemperature((int)gc.S);
+				}
+				break;
+
+                        // TODO: make this work properly
+                        case 116:
+                             ex[extruder_in_use]->waitForTemperature();
+				break;   
 
 // The valve (real, or virtual...) is now the way to control any extruder (such as
 // a pressurised paste extruder) that cannot move using E codes.

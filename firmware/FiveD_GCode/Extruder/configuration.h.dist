@@ -73,7 +73,12 @@
  #define TC_0 17  // CS Pin of MAX6607
 #else
  #define TEMP_PIN 3
+ #define BED_TEMP_PIN 6
 #endif
+
+// The heated bed thermistor
+
+#define BED_TEMP 6
 
 // Control pins for the A3949 chips
 

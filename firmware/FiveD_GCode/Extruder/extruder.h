@@ -9,6 +9,8 @@
 #define COOL 'C'          // set_cooler(byte e_speed);
 #define SET_T 'T'         // set_temperature(int temp);
 #define GET_T 't'         // get_temperature();
+#define SET_BED_T 'B'     // set bed temperature(int temp);
+#define GET_BED_T 'b'     // get bed temperature();
 #define STEP 'S'          // step();
 #define ENABLE 'E'        // enableStep();
 #define DISABLE 'e'       // disableStep();
@@ -52,14 +54,23 @@ private:
   int output;
   int error;
   float pTerm, iTerm, dTerm;
-  byte pin;
+  byte heat_pin, temp_pin;
+  bool bedTable;
+  int currentTemperature;
   
 public:
 
-  PIDcontrol(byte p);
-  void pidCalculation(int target, int current);
+  PIDcontrol(byte hp, byte tp, bool b);
+  void internalTemperature(short table[][2]);
+  void pidCalculation(int target);
+  int temperature();
   
 };
+
+inline int PIDcontrol::temperature() 
+{ 
+  return currentTemperature; 
+}
 
 
 class extruder
@@ -82,9 +93,7 @@ private:
    bool usePot;      // True to control the motor by the pot
    byte stp;         // Tracks the step signal
    int  targetTemperature;        // Target temperature in C
-   int  currentTemperature;           // Current temperature in C
    int  targetBedTemperature;        // Target bed temperature in C
-   int  currentBedTemperature;           // Current bed temperature in C   
    int  manageCount; // Timing in the manage function
    bool forward;     // Extrude direction
    char reply[REPLY_LENGTH];  // For sending messages back
@@ -109,7 +118,7 @@ private:
 
    void waitForTemperature();
    void slowManage();
-   int internalTemperature();
+   int internalTemperature(byte pin, short table[NUMTEMPS][2]);
    void valveSet(bool open);
    void setDirection(bool direction);
    void setCooler(byte e_speed);

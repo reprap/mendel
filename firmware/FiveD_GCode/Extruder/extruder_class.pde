@@ -6,9 +6,10 @@
 // With thanks to Adam at Makerbot and Tim at BotHacker
 // see http://blog.makerbot.com/2009/10/01/open-source-ftw/
 
-PIDcontrol::PIDcontrol(byte p)
+PIDcontrol::PIDcontrol(byte hp, byte tp, bool b)
 {
-   pin = p;
+   heat_pin = hp;
+   temp_pin = tp;
    pGain = TEMP_PID_PGAIN;
    iGain = TEMP_PID_IGAIN;
    dGain = TEMP_PID_DGAIN;
@@ -19,18 +20,104 @@ PIDcontrol::PIDcontrol(byte p)
    iState = 0;
    dState = 0;
    previousTime = millis()/MILLI_CORRECTION;
-   output = 0; 
+   output = 0;
+   currentTemperature = 0;
+   bedTable = b;
+   pinMode(heat_pin, OUTPUT);
+   pinMode(temp_pin, INPUT); 
 }
 
-void PIDcontrol::pidCalculation(int target, int current)
+/* 
+ Temperature reading function  
+ With thanks to: Ryan Mclaughlin - http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1230859336
+ for the MAX6675 code
+ */
+
+void PIDcontrol::internalTemperature(short table[][2])
 {
+#ifdef USE_THERMISTOR
+  int raw = analogRead(temp_pin);
+
+  byte i;
+
+  // TODO: This should do a binary chop
+
+  for (i=1; i<NUMTEMPS; i++)
+  {
+    if (table[i][0] > raw)
+    {
+      currentTemperature  = table[i-1][1] + 
+        (raw - table[i-1][0]) * 
+        (table[i][1] - table[i-1][1]) /
+        (table[i][0] - table[i-1][0]);
+
+      break;
+    }
+  }
+
+  // Overflow: Set to last value in the table
+  if (i >= NUMTEMPS) currentTemperature = table[i-1][1];
+  // Clamp to byte
+  //if (celsius > 255) celsius = 255; 
+  //else if (celsius < 0) celsius = 0; 
+
+#endif
+
+#ifdef AD595_THERMOCOUPLE
+  currentTemperature = ( 5.0 * analogRead(pin* 100.0) / 1024.0; //(int)(((long)500*(long)analogRead(TEMP_PIN))/(long)1024);
+#endif  
+
+#ifdef MAX6675_THERMOCOUPLE
+  int value = 0;
+  byte error_tc;
+
+
+  digitalWrite(TC_0, 0); // Enable device
+
+  /* Cycle the clock for dummy bit 15 */
+  digitalWrite(SCK,1);
+  digitalWrite(SCK,0);
+
+  /* Read bits 14-3 from MAX6675 for the Temp
+   	 Loop for each bit reading the value 
+   */
+  for (int i=11; i>=0; i--)
+  {
+    digitalWrite(SCK,1);  // Set Clock to HIGH
+    value += digitalRead(SO) << i;  // Read data and add it to our variable
+    digitalWrite(SCK,0);  // Set Clock to LOW
+  }
+
+  /* Read the TC Input inp to check for TC Errors */
+  digitalWrite(SCK,1); // Set Clock to HIGH
+  error_tc = digitalRead(SO); // Read data
+  digitalWrite(SCK,0);  // Set Clock to LOW
+
+  digitalWrite(TC_0, 1); //Disable Device
+
+  if(error_tc)
+    currentTemperature = 2000;
+  else
+    currentTemperature = value/4;
+
+#endif
+
+}
+
+
+void PIDcontrol::pidCalculation(int target)
+{
+  if(bedTable)
+    internalTemperature(bedtemptable);
+  else
+    internalTemperature(temptable);
   time = millis()/MILLI_CORRECTION;  // Correct for fast clock
   dt = time - previousTime;
   previousTime = time;
   if (dt <= 0) // Don't do it when millis() has rolled over
     return;
     
-  error = target - current;
+  error = target - currentTemperature;
 
   pTerm = pGain * error;
 
@@ -38,16 +125,16 @@ void PIDcontrol::pidCalculation(int target, int current)
   temp_iState = constrain(temp_iState, temp_iState_min, temp_iState_max);
   iTerm = iGain * temp_iState;
 
-  dTerm = dGain * (current - temp_dState);
-  temp_dState = current;
+  dTerm = dGain * (currentTemperature - temp_dState);
+  temp_dState = currentTemperature;
 
   output = pTerm + iTerm - dTerm;
   output = constrain(output, 0, 255);
   
-  analogWrite(pin, output);
+  analogWrite(heat_pin, output);
 }
 
-
+//**********************************************************************************************
 
 extruder::extruder()
 {
@@ -55,26 +142,22 @@ extruder::extruder()
   pinMode(H1E, OUTPUT);  
   pinMode(H2D, OUTPUT);
   pinMode(H2E, OUTPUT);
-  pinMode(HEATER_OUTPUT, OUTPUT);
   pinMode(FAN_OUTPUT, OUTPUT);
-  pinMode(BED_OUTPUT, OUTPUT);
   pinMode(E_STEP_PIN, INPUT);
   pinMode(E_DIR_PIN, INPUT);  
   pinMode(POT, INPUT);
+  
 #ifdef MAX6675_THERMOCOUPLE
   pinMode(SO, INPUT);
   pinMode(SCK, OUTPUT);
   pinMode(TC_0, OUTPUT); 
   digitalWrite(TC_0,HIGH);  // Disable MAX6675
-#else
-  pinMode(TEMP_PIN, INPUT);
 #endif
-
+  
   disableStep();
  
   extruderPID = &ePID;
   bedPID = &bPID;
- 
 
   // Defaults
 
@@ -82,9 +165,7 @@ extruder::extruder()
   forward = true;
   pwmValue =  STEP_PWM;
   targetTemperature = 0;
-  currentTemperature = 0;
   targetBedTemperature = 0;
-  currentBedTemperature = 0;
   manageCount = 0;
   stp = 0;
   potVal = 0;
@@ -106,10 +187,9 @@ extruder::extruder()
 
 
 void extruder::controlTemperature()
-{
-  currentTemperature = internalTemperature();     
-  extruderPID->pidCalculation(targetTemperature, currentTemperature);
-  bedPID->pidCalculation(targetBedTemperature, currentBedTemperature);
+{   
+  extruderPID->pidCalculation(targetTemperature);
+  bedPID->pidCalculation(targetBedTemperature);
 
 
   // Simple bang-bang temperature control
@@ -161,84 +241,6 @@ void extruder::manage()
 }
 
 
-/* 
- Temperature reading function  
- With thanks to: Ryan Mclaughlin - http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1230859336
- for the MAX6675 code
- */
-
-int extruder::internalTemperature()
-{
-#ifdef USE_THERMISTOR
-  int raw = analogRead(TEMP_PIN);
-
-  int celsius = raw;
-  byte i;
-
-  // TODO: This should do a binary chop
-
-  for (i=1; i<NUMTEMPS; i++)
-  {
-    if (temptable[i][0] > raw)
-    {
-      celsius  = temptable[i-1][1] + 
-        (raw - temptable[i-1][0]) * 
-        (temptable[i][1] - temptable[i-1][1]) /
-        (temptable[i][0] - temptable[i-1][0]);
-
-      break;
-    }
-  }
-
-  // Overflow: Set to last value in the table
-  if (i == NUMTEMPS) celsius = temptable[i-1][1];
-  // Clamp to byte
-  //if (celsius > 255) celsius = 255; 
-  //else if (celsius < 0) celsius = 0; 
-
-  return celsius;
-#endif
-
-#ifdef AD595_THERMOCOUPLE
-  return ( 5.0 * analogRead(TEMP_PIN) * 100.0) / 1024.0; //(int)(((long)500*(long)analogRead(TEMP_PIN))/(long)1024);
-#endif  
-
-#ifdef MAX6675_THERMOCOUPLE
-  int value = 0;
-  byte error_tc;
-
-
-  digitalWrite(TC_0, 0); // Enable device
-
-  /* Cycle the clock for dummy bit 15 */
-  digitalWrite(SCK,1);
-  digitalWrite(SCK,0);
-
-  /* Read bits 14-3 from MAX6675 for the Temp
-   	 Loop for each bit reading the value 
-   */
-  for (int i=11; i>=0; i--)
-  {
-    digitalWrite(SCK,1);  // Set Clock to HIGH
-    value += digitalRead(SO) << i;  // Read data and add it to our variable
-    digitalWrite(SCK,0);  // Set Clock to LOW
-  }
-
-  /* Read the TC Input inp to check for TC Errors */
-  digitalWrite(SCK,1); // Set Clock to HIGH
-  error_tc = digitalRead(SO); // Read data
-  digitalWrite(SCK,0);  // Set Clock to LOW
-
-  digitalWrite(TC_0, 1); //Disable Device
-
-  if(error_tc)
-    return 2000;
-  else
-    return value/4;
-
-#endif
-
-}
 
 // Stop everything
 
@@ -246,6 +248,7 @@ void extruder::shutdown()
 {
   // Heater off;
   setTemperature(0);
+  setBedTemperature(0);
   // Motor off
   disableStep();
   // Close valve
@@ -282,8 +285,19 @@ void extruder::setTemperature(int tp)
 
 int extruder::getTemperature()
 {
-  return currentTemperature;  
+  return extruderPID->temperature();  
 }
+
+void extruder::setBedTemperature(int tp)
+{
+  targetBedTemperature = tp;
+}
+
+int extruder::getBedTemperature()
+{
+  return bedPID->temperature();  
+}
+
 
 void extruder::sStep(byte dir)
 {
@@ -450,6 +464,14 @@ char* extruder::processCommand(char command[])
 
   case GET_T:
     itoa(getTemperature(), reply, 10);
+    break;
+    
+  case SET_BED_T:
+    setBedTemperature(atoi(&command[1]));
+    break;
+
+  case GET_BED_T:
+    itoa(getBedTemperature(), reply, 10);
     break;
 
   case STEP:
