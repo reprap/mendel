@@ -1,0 +1,11 @@
+This directory contains alternative parts to those in the standard Mendel.  Most of these are definite improvements.
+
+frame-vertex-with-foot-4off
+
+This hold the machine higher off the ground giving greater clearance fo moving parts underneath.  This is an alternative to gluing rubber feet on the machine (note - such feet may give better vibration isolation).  Replace four of the six frame vertices with these.
+
+
+set-screw-drive-pulley_3off
+
+These Mendel pulleys use an M3 grub screw and a captive nut. The advantage over the original is that you only need one small flat on the motor shaft, rather than two full length ones that have to be filed to exactly the right size.  Replace drive-pulley_3off with three of these.
+
