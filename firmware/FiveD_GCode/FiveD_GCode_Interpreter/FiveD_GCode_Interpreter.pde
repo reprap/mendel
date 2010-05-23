@@ -68,10 +68,10 @@ static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRU
 #else
 
 #if EXTRUDER_COUNT == 2    
-static extruder ex1(E1_NAME);            
+static extruder ex1(E1_NAME, E1_STEPS_PER_MM);            
 #endif
 
-static extruder ex0(E0_NAME);
+static extruder ex0(E0_NAME, E0_STEPS_PER_MM);
 
 intercom talker;
 

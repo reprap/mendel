@@ -164,14 +164,16 @@
 
 // For when we have a stepper-driven extruder
 // E_STEPS_PER_MM is the number of steps needed to 
-// extrude 1mm out of the nozzle.
+// extrude 1mm out of the nozzle.  E0 for extruder 0;
+// E1 for extruder 1, and so on.
 
 //#define E_STEPS_PER_MM   0.9 //0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
 
 //#define E_STEPS_PER_MM   2.2       // NEMA 14 geared extruder 8mm diameter drive
-#define E_STEPS_PER_MM   1.8       // NEMA 17 55/11 geared extruder 8mm diameter drive
+#define E0_STEPS_PER_MM   1.8       // NEMA 17 55/11 geared extruder 8mm diameter drive
+#define E1_STEPS_PER_MM   1.8       // NEMA 17 55/11 geared extruder 8mm diameter drive
 
-#define E_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM) // *RO
+//#define E0_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM) // *RO
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 3000.0

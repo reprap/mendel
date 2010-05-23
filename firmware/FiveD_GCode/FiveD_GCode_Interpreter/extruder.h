@@ -150,7 +150,7 @@ class extruder
 {
   
 public:
-   extruder(char name);
+   extruder(char name, float spm);
    void waitForTemperature();
    void valveSet(bool open, int dTime);
    void setDirection(bool direction);
@@ -168,6 +168,7 @@ public:
    void usePotForMotor();
    void shutdown();
    bool ping();
+   float stepsPerMM();
  
 private:
 
@@ -178,6 +179,7 @@ private:
    char commandBuffer[RS485_BUF_LEN];
    char* reply;
    bool stp;
+   float sPerMM;
 
    void buildCommand(char c);   
    void buildCommand(char c, char v);
@@ -185,15 +187,21 @@ private:
    void temperatureError();  
 };
 
-inline extruder::extruder(char name)
+inline extruder::extruder(char name, float spm)
 {
   my_name = name;
+  sPerMM = spm;
   pinMode(E_STEP_PIN, OUTPUT);
   pinMode(E_DIR_PIN, OUTPUT);
   digitalWrite(E_STEP_PIN, 0);
   digitalWrite(E_DIR_PIN, 0);
   setTemperature(0);
   stp = false;
+}
+
+inline float extruder::stepsPerMM()
+{
+  return sPerMM;
 }
 
 inline void extruder::buildCommand(char c)

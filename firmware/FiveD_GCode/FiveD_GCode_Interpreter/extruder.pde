@@ -27,6 +27,7 @@ void newExtruder(byte e)
   if(e != extruder_in_use)
   {  
     extruder_in_use = e;
+    setUnits(cdda[0]->get_units());
     //setExtruder();
   }
 }

@@ -17,6 +17,7 @@ private:
 
   //extruder* ext;               // The extruder I'm currently using - keep this up to date...
 
+  bool using_mm;
   FloatPoint units;            // Factors for converting either mm or inches to steps
 
   FloatPoint target_position;  // Where it's going
@@ -104,6 +105,8 @@ public:
   // True for mm; false for inches
   
   void set_units(bool using_mm);
+  void set_units();
+  bool get_units();
   
   // Kill - stop all activity and turn off steppers
   
@@ -121,6 +124,11 @@ public:
 //{
 //  ext = ex;
 //}
+
+inline bool cartesian_dda::get_units()
+{
+  return using_mm;
+}
 
 inline bool cartesian_dda::active()
 {

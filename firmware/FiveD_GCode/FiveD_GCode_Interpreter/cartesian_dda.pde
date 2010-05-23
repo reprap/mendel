@@ -71,22 +71,30 @@ cartesian_dda::cartesian_dda()
 
 // Switch between mm and inches
 
+void cartesian_dda::set_units(bool um)
+{
+  using_mm = um;
+  set_units();
+}
 
-void cartesian_dda::set_units(bool using_mm)
+
+void cartesian_dda::set_units()
 {
     if(using_mm)
     {
       units.x = X_STEPS_PER_MM;
       units.y = Y_STEPS_PER_MM;
       units.z = Z_STEPS_PER_MM;
-      units.e = E_STEPS_PER_MM;
+      //units.e = E_STEPS_PER_MM;
+      units.e = ex[extruder_in_use]->stepsPerMM();
       units.f = 1.0;
     } else
     {
       units.x = X_STEPS_PER_INCH;
       units.y = Y_STEPS_PER_INCH;
       units.z = Z_STEPS_PER_INCH;
-      units.e = E_STEPS_PER_INCH;
+      //units.e = E_STEPS_PER_INCH;
+      units.e = ex[extruder_in_use]->stepsPerMM()*INCHES_TO_MM;
       units.f = 1.0;  
     }
 }
