@@ -144,6 +144,9 @@ void setup()
   cdda[2] = &cdda2;  
   cdda[3] = &cdda3;
   
+  for(byte i = 0; i < 4; i++)
+    cdda[i]->set_units(true);
+  
   //setExtruder();
   
   init_process_string();

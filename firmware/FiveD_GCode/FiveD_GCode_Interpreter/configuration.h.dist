@@ -170,8 +170,8 @@
 //#define E_STEPS_PER_MM   0.9 //0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
 
 //#define E_STEPS_PER_MM   2.2       // NEMA 14 geared extruder 8mm diameter drive
-#define E0_STEPS_PER_MM   1.8       // NEMA 17 55/11 geared extruder 8mm diameter drive
-#define E1_STEPS_PER_MM   1.8       // NEMA 17 55/11 geared extruder 8mm diameter drive
+#define E0_STEPS_PER_MM   2.2       // NEMA 17 55/11 geared extruder 8mm diameter drive
+#define E1_STEPS_PER_MM   2.2      // NEMA 17 55/11 geared extruder 8mm diameter drive
 
 //#define E0_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM) // *RO
 
