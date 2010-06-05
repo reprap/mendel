@@ -21,8 +21,6 @@ http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 
 */
 
-
-
 // Yep, this is actually -*- c++ -*-
 
 // Sanguino G-code Interpreter
@@ -33,10 +31,9 @@ http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 // Sanguino v1.4 by Adrian Bowyer - added the Sanguino; extensive mods... (a.bowyer@bath.ac.uk)
 // Sanguino v1.5 by Adrian Bowyer - implemented 4D Bressenham XYZ+ stepper control... (a.bowyer@bath.ac.uk)
 // Sanguino v1.6 by Adrian Bowyer - implemented RS485 extruders
+// Arduino Mega v1.7 by Adrian Bowyer
 
-#ifndef __AVR_ATmega644P__
-#error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
-#endif
+
 
 
 // Maintain a list of extruders...
@@ -47,6 +44,9 @@ byte extruder_in_use = 0;
 // Text placed in this (terminated with 0) will be transmitted back to the host
 // along with the next G Code acknowledgement.
 char debugstring[100];
+
+
+// Old Mothers...
 
 #if MOTHERBOARD < 2
 
@@ -62,10 +62,12 @@ static extruder ex1(EXTRUDER_1_MOTOR_DIR_PIN, EXTRUDER_1_MOTOR_SPEED_PIN , EXTRU
 
 static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
             EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
-            EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);
-            
-            
-#else
+            EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);         
+#endif
+
+// Standard Mendel
+
+#if MOTHERBOARD == 2
 
 #if EXTRUDER_COUNT == 2    
 static extruder ex1(E1_NAME, E1_STEPS_PER_MM);            
@@ -74,6 +76,18 @@ static extruder ex1(E1_NAME, E1_STEPS_PER_MM);
 static extruder ex0(E0_NAME, E0_STEPS_PER_MM);
 
 intercom talker;
+
+#endif
+
+// Arduino Mega
+
+#if MOTHERBOARD == 3
+
+#if EXTRUDER_COUNT == 2            
+static extruder ex1(EXTRUDER_0_STEP_PIN, EXTRUDER_0_DIR_PIN, EXTRUDER_0_ENABLE_PIN, EXTRUDER_0_HEATER_PIN, EXTRUDER_0_TEMPERATURE_PIN);            
+#endif
+
+static extruder ex1(EXTRUDER_1_STEP_PIN, EXTRUDER_1_DIR_PIN, EXTRUDER_1_ENABLE_PIN, EXTRUDER_1_HEATER_PIN, EXTRUDER_1_TEMPERATURE_PIN); 
 
 #endif
 
@@ -98,7 +112,6 @@ FloatPoint where_i_am;
 
 // Our interrupt function
 
-//SIGNAL(SIG_OUTPUT_COMPARE1A)
 ISR(TIMER1_COMPA_vect)
 {
   disableTimerInterrupt();
@@ -151,16 +164,11 @@ void setup()
   
   init_process_string();
   
-/*  where_i_am.x = 0.0;
-  where_i_am.y = 0.0;
-  where_i_am.z = 0.0;
-  where_i_am.e = 0.0;
-  where_i_am.f = SLOW_XY_FEEDRATE;
-*/  
+
   Serial.begin(HOST_BAUD);
   Serial.println("start");
   
-#if MOTHERBOARD > 1
+#if MOTHERBOARD == 2 
     pinMode(PS_ON_PIN, OUTPUT);  // add to run G3 as built by makerbot
     digitalWrite(PS_ON_PIN, LOW);   // ditto
     delay(2000);    
@@ -215,7 +223,7 @@ void loop()
 {
    manageAllExtruders();
    get_and_do_command(); 
-#if MOTHERBOARD > 1
+#if MOTHERBOARD == 2
    talker.tick();
 #endif
 }

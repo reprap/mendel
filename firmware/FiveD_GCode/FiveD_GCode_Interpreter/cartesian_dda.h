@@ -1,7 +1,8 @@
 /*
  * This class controls the movement of the RepRap machine.
- * It implements a DDA in four dimensions, so the length of extruded 
- * filament is treated as a variable, just like X, Y, and Z.
+ * It implements a DDA in five dimensions, so the length of extruded 
+ * filament is treated as a variable, just like X, Y, and Z.  Speed
+ * is also a variable, making accelleration and deceleration automatic.
  *
  * Adrian Bowyer 9 May 2009
  */
@@ -15,7 +16,6 @@ class cartesian_dda
 {
 private:
 
-  //extruder* ext;               // The extruder I'm currently using - keep this up to date...
 
   bool using_mm;
   FloatPoint units;            // Factors for converting either mm or inches to steps
@@ -77,10 +77,6 @@ private:
   void enable_steppers();
   void disable_steppers();
   
-  // Custom short delay function (microseconds)
-  
-  //void delayMicrosecondsInterruptible(unsigned int us);
-  
   
 public:
 
@@ -112,18 +108,10 @@ public:
   
   void kill();
   
-  // Record the selection of a new extruder
-  
-  //void set_extruder(extruder* ex);
 };
 
 // Short functions inline to save memory; particularly useful in the Arduino
 
-
-//inline void cartesian_dda::set_extruder(extruder* ex)
-//{
-//  ext = ex;
-//}
 
 inline bool cartesian_dda::get_units()
 {

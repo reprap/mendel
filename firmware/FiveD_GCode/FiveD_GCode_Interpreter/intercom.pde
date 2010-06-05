@@ -7,7 +7,7 @@
 
 #include "intercom.h"
 
-#if MOTHERBOARD > 1
+#if MOTHERBOARD == 2
 
 
 #if RS485_MASTER == 1

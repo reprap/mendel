@@ -27,7 +27,7 @@
 
 // These settings are mainly for Darwin
 
-#if MOTHERBOARD < 2
+#if MOTHERBOARD == 1
 
 // Comment out this if you are using a thermocouple
 #define USE_THERMISTOR
@@ -45,11 +45,13 @@
 #define Y_ENDSTOP_INVERTING false
 #define Z_ENDSTOP_INVERTING false
 
+#endif
+
 //**********************************************************************************************
 
-// These settings are mainly for Mendel
+// These settings are mainly for a standard Mendel
 
-#else
+#if MOTHERBOARD == 2
 
 // Comment out the next line if you are running a Darwin with a MOTHERBOARD > 1
 
@@ -78,6 +80,37 @@
 #define E1_NAME '1'           // Byte representing the name of extruder 1
 
 #define RS485_MASTER  1       // *RO
+
+#endif
+
+//**********************************************************************************************
+
+// These settings are mainly for a Mendel with an Arduino Mega controller
+
+#if MOTHERBOARD == 3
+
+#define MENDEL 1
+
+// Comment out this if you are using a thermocouple
+#define USE_THERMISTOR
+
+// Set to 1 if enable pins are inverting
+// For RepRap stepper boards version 1.x the enable pins are *not* inverting.
+// For RepRap stepper boards version 2.x and above the enable pins are inverting.
+#define INVERT_ENABLE_PINS 1
+
+// Set to one if the axis opto-sensor outputs inverting (ie: 1 means open, 0 means closed)
+// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
+// are inverting.
+
+#define X_ENDSTOP_INVERTING true
+#define Y_ENDSTOP_INVERTING true
+#define Z_ENDSTOP_INVERTING true
+
+// Does your machine have the older standard slotted pullyes (needing lots of motor shaft filing)
+// or the newer pulleys with grub screws?  Uncomment one of the two next lines.
+//#define SLOTTED_PULLEYS
+#define GRUB_PULLEYS
 
 #endif
 
@@ -144,7 +177,9 @@
 #define INVERT_Z_DIR 0
 #endif
 
-#else
+#endif
+
+#if MOTHERBOARD == 1
 
 // This is for Darwin.
 
@@ -170,8 +205,8 @@
 //#define E_STEPS_PER_MM   0.9 //0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
 
 //#define E_STEPS_PER_MM   2.2       // NEMA 14 geared extruder 8mm diameter drive
-#define E0_STEPS_PER_MM   2.2       // NEMA 17 55/11 geared extruder 8mm diameter drive
-#define E1_STEPS_PER_MM   2.2      // NEMA 17 55/11 geared extruder 8mm diameter drive
+#define E0_STEPS_PER_MM   2.0       // NEMA 17 55/11 geared extruder 8mm diameter drive
+#define E1_STEPS_PER_MM   2.0      // NEMA 17 55/11 geared extruder 8mm diameter drive
 
 //#define E0_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM) // *RO
 

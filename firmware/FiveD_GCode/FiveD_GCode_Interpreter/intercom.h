@@ -28,7 +28,7 @@
 #ifndef INTERCOM_H
 #define INTERCOM_H
 
-#if MOTHERBOARD > 1
+#if MOTHERBOARD == 2
 
 // Locations in a packet
 

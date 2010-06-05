@@ -4,7 +4,7 @@
 // How accurately do we maintain the temperature?
 #define HALF_DEAD_ZONE 5
 
-#if MOTHERBOARD < 2
+#if MOTHERBOARD != 2
 
 // Uncomment the next line if you are using a thermistor; leave it if you have a thermocouple
 //#define USE_THERMISTOR

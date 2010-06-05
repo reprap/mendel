@@ -43,6 +43,10 @@
 ****************************************************************************************/
 #elif MOTHERBOARD == 1
 
+#ifndef __AVR_ATmega644P__
+#error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
+#endif
+
 #define DEBUG_PIN        0
 
 #define X_STEP_PIN (byte)15
@@ -91,6 +95,10 @@
 
 #elif MOTHERBOARD == 2
 
+#ifndef __AVR_ATmega644P__
+#error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
+#endif
+
 //x axis pins
 #define X_STEP_PIN      15
 #define X_DIR_PIN       18
@@ -138,7 +146,50 @@
 
 #elif MOTHERBOARD == 3
 
-#error The Arduino Mega is not yet implemented for the 5D GCode interpreter
+#ifndef __AVR_ATmega1280__
+#error Oops!  Make sure you have 'Arduino Mega' selected from the 'Tools -> Boards' menu.
+#endif
+
+#define DEBUG_PIN        13
+
+#define X_STEP_PIN (byte)48
+#define X_DIR_PIN (byte)47
+#define X_MIN_PIN (byte)45
+//#define X_MAX_PIN (byte)21
+#define X_ENABLE_PIN (byte)46
+
+#define Y_STEP_PIN (byte)43
+#define Y_DIR_PIN (byte)42
+#define Y_MIN_PIN (byte)44
+//#define Y_MAX_PIN (byte)26
+#define Y_ENABLE_PIN (byte)40
+
+#define Z_STEP_PIN (byte)35
+#define Z_DIR_PIN (byte)34
+#define Z_MIN_PIN (byte)37
+//#define Z_MAX_PIN (byte)1
+#define Z_ENABLE_PIN (byte)33
+
+// Heated bed
+
+#define BED_HEATER_PIN (byte)1
+#define BED_TEMPERATURE_PIN (byte)2 
+
+
+//extruder pins
+
+#define EXTRUDER_0_STEP_PIN (byte)30
+#define EXTRUDER_0_DIR_PIN (byte)15
+#define EXTRUDER_0_ENABLE_PIN (byte)14
+#define EXTRUDER_0_HEATER_PIN (byte)2
+#define EXTRUDER_0_TEMPERATURE_PIN (byte)0 
+
+#define EXTRUDER_1_STEP_PIN (byte)4
+#define EXTRUDER_1_DIR_PIN (byte)5
+#define EXTRUDER_1_ENABLE_PIN (byte)6
+#define EXTRUDER_1_HEATER_PIN (byte)13
+#define EXTRUDER_1_TEMPERATURE_PIN (byte)1 
+
 
 #else
 

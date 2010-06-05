@@ -28,7 +28,6 @@ void newExtruder(byte e)
   {  
     extruder_in_use = e;
     setUnits(cdda[0]->get_units());
-    //setExtruder();
   }
 }
 
@@ -90,13 +89,11 @@ void extruder::temperatureError()
 
 /***************************************************************************************************************************
  * 
- * If we have a new motherboard (V 1.x, x >= 1), the extruder is entirely controlled via the RS485, and all  the functions to do
- * it are simple inlines in extruder.h
- * 
- * Otherwise, we have to do the work ourselves...
+ * Darwin-style motherboard
  */
 
-#if MOTHERBOARD < 2   
+#if MOTHERBOARD == 1 
+
 extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin)
 {
   motor_dir_pin = md_pin;
@@ -300,56 +297,19 @@ void extruder::manage()
 }
 
 
-#if 0
-void extruder::setSpeed(float sp)
-{
-  // DC motor?
-  if(step_en_pin < 0)
-  {
-    e_speed = (byte)sp;
-    if(e_speed > 0)
-      waitForTemperature();
-    analogWrite(motor_speed_pin, e_speed);
-    return;
-  }
 
-  // No - stepper
-  disableTimerInterrupt();
 
-  if(sp <= 1.0e-4)
-  {
-    disableStep();
-    e_speed = 0; // Just use this as a flag
-    return;
-  } 
-  else
-  {
-    waitForTemperature();
-    enableStep();
-    e_speed = 1;
-  }
+/***************************************************************************************************************************
+ * 
+ * Arduino Mega motherboard
+ */
+#if MOTHERBOARD == 3
 
-  extrude_step_count = 0;
 
-  float milliseconds_per_step = 60000.0/(E_STEPS_PER_MM*sp);
-  long thousand_ticks_per_step = 4*(long)(milliseconds_per_step);
-  setupTimerInterrupt();
-  setTimer(thousand_ticks_per_step);
-  enableTimerInterrupt();
-}
 
-void extruder::interrupt()
-{
-  if(!e_speed)
-    return;
-  extrude_step_count++;
-  if(extrude_step_count > 1000)
-  {
-    step();
-    extrude_step_count = 0;
-  }
-}
 
 #endif
+
+
 #endif
 

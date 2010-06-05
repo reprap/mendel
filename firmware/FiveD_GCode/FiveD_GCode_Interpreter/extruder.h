@@ -18,7 +18,7 @@ void newExtruder(byte e);
 
 */
 
-#if MOTHERBOARD < 2
+#if MOTHERBOARD == 1
 
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
@@ -119,15 +119,15 @@ inline void extruder::setCooler(byte sp)
   analogWrite(fan_pin, sp);
 }
 
+#endif
+
 /**********************************************************************************************
-
-* RepRap Motherboard v 1.x (x >= 1)
-* Extruder is now on RS485
-
+*
+* RepRap Motherboard with extruder is on RS485
+*
 */
 
-#else
-
+#if MOTHERBOARD == 2
 
 #define WAIT_T 'W'        // wait_for_temperature();
 #define VALVE 'V'         // valve_set(bool open, int dTime);
@@ -349,6 +349,53 @@ inline bool extruder::ping()
 }
 
 #endif
+
+/**********************************************************************************************
+*
+* RepRap Arduino Mega Motherboard
+*
+*/
+
+#if MOTHERBOARD == 3
+
+class extruder
+{
+  
+public:
+   extruder(char name, float spm);
+   void waitForTemperature();
+   void valveSet(bool open, int dTime);
+   void setDirection(bool direction);
+   void setCooler(byte e_speed);
+   void setTemperature(int temp);
+   int getBedTemperature();
+   void setBedTemperature(int temp);
+   int getTemperature();
+   void manage();
+   void sStep();
+   void enableStep();
+   void disableStep();
+   int potVoltage();
+   void setPWM(int p);
+   void usePotForMotor();
+   void shutdown();
+   bool ping();
+   float stepsPerMM();
+ 
+private:
+
+   int target_celsius;
+   int count;
+   int oldT, newT;
+   bool stp;
+   float sPerMM;
+
+   void temperatureError();  
+};
+
+#endif
+
+//*********************************************************************************************************
 
 extern extruder* ex[ ];
 extern byte extruder_in_use;

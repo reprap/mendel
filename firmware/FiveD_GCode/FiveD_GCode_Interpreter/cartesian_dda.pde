@@ -31,7 +31,8 @@ cartesian_dda::cartesian_dda()
 	target_position.e = 0.0;
         target_position.f = SLOW_XY_FEEDRATE;
 
-  // Set up the pin directions
+// TODO: why is this here, and not in satrtup()?
+// Set up the pin directions
   
 	pinMode(X_STEP_PIN, OUTPUT);
 	pinMode(X_DIR_PIN, OUTPUT);
@@ -85,7 +86,6 @@ void cartesian_dda::set_units()
       units.x = X_STEPS_PER_MM;
       units.y = Y_STEPS_PER_MM;
       units.z = Z_STEPS_PER_MM;
-      //units.e = E_STEPS_PER_MM;
       units.e = ex[extruder_in_use]->stepsPerMM();
       units.f = 1.0;
     } else
@@ -93,7 +93,6 @@ void cartesian_dda::set_units()
       units.x = X_STEPS_PER_INCH;
       units.y = Y_STEPS_PER_INCH;
       units.z = Z_STEPS_PER_INCH;
-      //units.e = E_STEPS_PER_INCH;
       units.e = ex[extruder_in_use]->stepsPerMM()*INCHES_TO_MM;
       units.f = 1.0;  
     }
@@ -298,10 +297,7 @@ void cartesian_dda::dda_step()
   
                 if(real_move)
                 {
-                  //if(t_scale > 1)
-                    timestep = t_scale*current_steps.f;
-                  //else
-                    //timestep = current_steps.f;
+                  timestep = t_scale*current_steps.f;
                   timestep = calculate_feedrate_delay((float) timestep);
                   setTimer(timestep);
                 }
@@ -365,10 +361,7 @@ void cartesian_dda::dda_start()
         digitalWrite(Z_DIR_PIN, d);
 
 
-       //if(e_direction)
-         ex[extruder_in_use]->setDirection(e_direction);
-       //else
-         //ex[extruder_in_use]->setDirection(false);
+       ex[extruder_in_use]->setDirection(e_direction);
   
     //turn on steppers to start moving =)
     
