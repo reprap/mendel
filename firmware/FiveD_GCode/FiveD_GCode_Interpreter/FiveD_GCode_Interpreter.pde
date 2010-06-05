@@ -1,3 +1,13 @@
+#include <ctype.h>
+#include <HardwareSerial.h>
+#include <avr/pgmspace.h>
+#include "WProgram.h"
+#include "vectors.h"
+#include "configuration.h"
+#include "intercom.h"
+#include "pins.h"
+#include "extruder.h"
+#include "cartesian_dda.h"
 
 /**
 
@@ -28,16 +38,6 @@ http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 #error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
 #endif
 
-#include <ctype.h>
-#include <HardwareSerial.h>
-#include <avr/pgmspace.h>
-#include "WProgram.h"
-#include "vectors.h"
-#include "configuration.h"
-#include "intercom.h"
-#include "pins.h"
-#include "extruder.h"
-#include "cartesian_dda.h"
 
 // Maintain a list of extruders...
 
