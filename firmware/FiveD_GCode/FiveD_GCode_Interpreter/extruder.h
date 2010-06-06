@@ -358,11 +358,60 @@ inline bool extruder::ping()
 
 #if MOTHERBOARD == 3
 
+//******************************************************************************************************
+
+// PID definitions
+
+#define TEMP_PID_INTEGRAL_DRIVE_MAX 110
+#define TEMP_PID_PGAIN 5.0
+#define TEMP_PID_IGAIN 0.1
+#define TEMP_PID_DGAIN 100.0
+
+class PIDcontrol
+{
+  
+private:
+
+  volatile int iState; // Integrator state
+  volatile int dState; // Last position input
+  unsigned long previousTime; // ms
+  unsigned long time;
+  int dt;
+  float pGain;
+  float iGain;
+  float dGain;
+  int temp_dState;
+  long temp_iState;
+  float temp_iState_max;
+  float temp_iState_min;
+  int output;
+  int error;
+  float pTerm, iTerm, dTerm;
+  byte heat_pin, temp_pin;
+  bool bedTable;
+  int currentTemperature;
+  
+public:
+
+  PIDcontrol(byte hp, byte tp, bool b);
+  void internalTemperature(short table[][2]);
+  void pidCalculation(int target);
+  int temperature();
+  
+};
+
+inline int PIDcontrol::temperature() 
+{ 
+  return currentTemperature; 
+}
+
+
+
 class extruder
 {
   
 public:
-   extruder(char name, float spm);
+   extruder(byte step, byte dir, byte en, byte heat, byte temp);
    void waitForTemperature();
    void valveSet(bool open, int dTime);
    void setDirection(bool direction);
@@ -389,6 +438,23 @@ private:
    int oldT, newT;
    bool stp;
    float sPerMM;
+   
+    int target_celsius;
+    int max_celsius;
+    byte heater_low;
+    byte heater_high;
+    byte heater_current;
+    int extrude_step_count;
+
+    bool e_direction;
+    bool valve_open;
+
+// The pins we control
+    byte motor_dir_pin, motor_speed_pin, heater_pin, fan_pin, temp_pin, valve_dir_pin, valve_en_pin, step_en_pin;
+    
+     byte wait_till_hot();
+     //byte wait_till_cool(); 
+     int sampleTemperature();
 
    void temperatureError();  
 };
