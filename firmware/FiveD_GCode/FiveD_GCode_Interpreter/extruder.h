@@ -417,8 +417,8 @@ public:
    void setDirection(bool direction);
    void setCooler(byte e_speed);
    void setTemperature(int temp);
-   int getBedTemperature();
-   void setBedTemperature(int temp);
+//   int getBedTemperature();
+//   void setBedTemperature(int temp);
    int getTemperature();
    void manage();
    void sStep();
@@ -440,23 +440,32 @@ private:
    float sPerMM;
    
     int target_celsius;
-    int max_celsius;
-    byte heater_low;
-    byte heater_high;
-    byte heater_current;
-    int extrude_step_count;
+//    int max_celsius;
+//    byte heater_low;
+//    byte heater_high;
+//    byte heater_current;
+//    int extrude_step_count;
 
     bool e_direction;
-    bool valve_open;
+
+    
+    byte wait_till_hot();
+    //byte wait_till_cool(); 
+    int sampleTemperature();
+
+    void temperatureError(); 
 
 // The pins we control
-    byte motor_dir_pin, motor_speed_pin, heater_pin, fan_pin, temp_pin, valve_dir_pin, valve_en_pin, step_en_pin;
-    
-     byte wait_till_hot();
-     //byte wait_till_cool(); 
-     int sampleTemperature();
+    byte motor_step_pin, motor_dir_pin, heater_pin,  temp_pin,  motor_en_pin;
 
-   void temperatureError();  
+    //byte fan_pin;
+    
+#ifdef PASTE_EXTRUDER
+    byte valve_dir_pin, valve_en_pin;
+    bool valve_open;
+#endif
+    
+ 
 };
 
 #endif

@@ -2,7 +2,7 @@
 
 #include "configuration.h"
 #include "pins.h"
-#include "ThermistorTable.h"
+#include "Temperature.h"
 #include "intercom.h"
 #include "extruder.h" 
 
@@ -439,54 +439,36 @@ void PIDcontrol::pidCalculation(int target)
 
 extruder::extruder(byte step, byte dir, byte en, byte heat, byte temp)
 {
-  motor_dir_pin = md_pin;
-  motor_speed_pin = ms_pin;
-  heater_pin = h_pin;
-  fan_pin = f_pin;
-  temp_pin = t_pin;
-  valve_dir_pin = vd_pin;
-  valve_en_pin = ve_pin;
-  step_en_pin = se_pin;
+  motor_step_pin = step;
+  motor_dir_pin = dir;
+  motor_en_pin = en;
+  heater_pin = heat;
+  temp_pin = temp;
+  
+  //fan_pin = ;
 
   //setup our pins
+  pinMode(motor_step_pin, OUTPUT);
   pinMode(motor_dir_pin, OUTPUT);
-  pinMode(motor_speed_pin, OUTPUT);
+  pinMode(motor_en_pin, OUTPUT);
   pinMode(heater_pin, OUTPUT);
-
   pinMode(temp_pin, INPUT);
-  pinMode(valve_dir_pin, OUTPUT); 
-  pinMode(valve_en_pin, OUTPUT);
 
   //initialize values
   digitalWrite(motor_dir_pin, EXTRUDER_FORWARD);
 
   analogWrite(heater_pin, 0);
-  analogWrite(motor_speed_pin, 0);
-  digitalWrite(valve_dir_pin, false);
-  digitalWrite(valve_en_pin, 0);
 
-  // The step enable pin and the fan pin are the same...
-  // We can have one, or the other, but not both
-
-  if(step_en_pin >= 0)
-  {
-    pinMode(step_en_pin, OUTPUT);
-    disableStep();
-  } 
-  else
-  {
-    pinMode(fan_pin, OUTPUT);
-    analogWrite(fan_pin, 0);
-  }
+  disableStep();
 
   //these our the default values for the extruder.
-  e_speed = 0;
+
   target_celsius = 0;
-  max_celsius = 0;
-  heater_low = 64;
-  heater_high = 255;
-  heater_current = 0;
-  valve_open = false;
+//  max_celsius = 0;
+//  heater_low = 64;
+//  heater_high = 255;
+//  heater_current = 0;
+
 
   //this is for doing encoder based extruder control
   //        rpm = 0;
@@ -494,38 +476,48 @@ extruder::extruder(byte step, byte dir, byte en, byte heat, byte temp)
   //        error = 0;
   //        last_extruder_error = 0;
   //        error_delta = 0;
-  e_direction = EXTRUDER_FORWARD;
+//  e_direction = EXTRUDER_FORWARD;
 
   //default to cool
   setTemperature(target_celsius);
+  
+#ifdef PASTE_EXTRUDER
+  valve_dir_pin = vd_pin;
+  valve_en_pin = ve_pin;
+  pinMode(valve_dir_pin, OUTPUT); 
+  pinMode(valve_en_pin, OUTPUT);
+  digitalWrite(valve_dir_pin, false);
+  digitalWrite(valve_en_pin, 0);
+  valve_open = false;
+#endif
 }
 
+#if 0
 void extruder::shutdown()
 {
   analogWrite(heater_pin, 0); 
-  digitalWrite(step_en_pin, !ENABLE_ON);
+  disableStep();
   valveSet(false, 500);
 }
 
+
 void extruder::valveSet(bool open, int dTime)
 {
+#ifdef PASTE_EXTRUDER
   waitForTemperature();
   valve_open = open;
   digitalWrite(valve_dir_pin, open);
   digitalWrite(valve_en_pin, 1);
   delay(dTime);
   digitalWrite(valve_en_pin, 0);
+#endif
 }
 
 
 void extruder::setTemperature(int temp)
 {
   target_celsius = temp;
-  max_celsius = (temp*11)/10;
-
-  // If we've turned the heat off, we might as well disable the extrude stepper
-  // if(target_celsius < 1)
-  //  disableStep(); 
+  //max_celsius = (temp*11)/10;
 }
 
 /**
@@ -570,6 +562,7 @@ int extruder::getTemperature()
 /*
 * This function gives us an averaged sample of the analog temperature pin.
  */
+/*
 int extruder::sampleTemperature()
 {
   int raw = 0;
@@ -584,6 +577,7 @@ int extruder::sampleTemperature()
   //send it back.
   return raw;
 }
+*/
 
 /*!
  Manages extruder functions to keep temps, speeds etc
@@ -663,22 +657,12 @@ extruder::extruder()
   kickStartValve();
 #endif
 }
-
+#endif
 
 void extruder::controlTemperature()
 {   
   extruderPID->pidCalculation(targetTemperature);
-  bedPID->pidCalculation(targetBedTemperature);
-
-
-  // Simple bang-bang temperature control
-
-//  if(targetTemperature > currentTemperature)
-//    digitalWrite(HEATER_OUTPUT, 1);
-//  else
-//    digitalWrite(HEATER_OUTPUT, 0);
-
- 
+  //bedPID->pidCalculation(targetBedTemperature);
 }
 
 
@@ -687,6 +671,7 @@ void extruder::slowManage()
 {
   manageCount = 0;
   
+/*  
   potSum += (potVoltage() >> 2);
   potCount++;
   if(potCount >= 10)
@@ -695,6 +680,7 @@ void extruder::slowManage()
     potCount = 0;
     potSum = 0;
   }
+*/
 
   //blink(true);  
 
@@ -703,13 +689,15 @@ void extruder::slowManage()
 
 void extruder::manage()
 {
+  /*
   byte s = digitalRead(E_STEP_PIN);
   if(s != stp)
   {
     stp = s;
     sStep(0);
   }
-
+  */
+  
 #ifdef PASTE_EXTRUDER
   valveMonitor();
 #endif
@@ -727,7 +715,7 @@ void extruder::shutdown()
 {
   // Heater off;
   setTemperature(0);
-  setBedTemperature(0);
+  //setBedTemperature(0);
   // Motor off
   disableStep();
   // Close valve
@@ -749,12 +737,12 @@ void extruder::valveSet(bool closed)
 
 void extruder::setDirection(bool direction)
 {
-  forward = direction;  
+  digitalWrite(motor_dir_pin, direction);  
 }
 
 void extruder::setCooler(byte e_speed)
 {
-  analogWrite(FAN_OUTPUT, e_speed);   
+  //analogWrite(FAN_OUTPUT, e_speed);   
 }
 
 void extruder::setTemperature(int tp)
@@ -767,6 +755,7 @@ int extruder::getTemperature()
   return extruderPID->temperature();  
 }
 
+/*
 void extruder::setBedTemperature(int tp)
 {
   targetBedTemperature = tp;
@@ -777,117 +766,13 @@ int extruder::getBedTemperature()
   return bedPID->temperature();  
 }
 
+*/
 
-void extruder::sStep(byte dir)
-{
-#ifndef PASTE_EXTRUDER
-  byte pwm;
-  
-  if(usePot)
-    pwm = potVal;
-  else
-    pwm = pwmValue;
-
-  // This increments or decrements coilPosition then writes the appropriate pattern to the output pins.
-
-  switch(dir)
-  {
-    case 1:
-      coilPosition++;
-      break;
-      
-    case 2:
-      coilPosition--;
-      break;
-      
-    default:
-      if(digitalRead(E_DIR_PIN))
-        coilPosition++;
-      else
-        coilPosition--;
-      break;
-  }
-  
-  coilPosition &= 7;
-
-  // Which of the 8 possible patterns do we want?
-  // The pwm = (pwm >> 1) + (pwm >> 3); lines
-  // ensure (roughly) equal power on the half-steps
-
-#ifdef FULL_STEP
-  switch((coilPosition&3) << 1)
-#else
-  switch(coilPosition)
-#endif 
-  {
-  case 7:
-    pwm = (pwm >> 1) + (pwm >> 3);
-    digitalWrite(H1D, 1);    
-    digitalWrite(H2D, 1);
-    analogWrite(H1E, pwm);
-    analogWrite(H2E, pwm);    
-    break;
-
-  case 6:
-    digitalWrite(H1D, 1);    
-    digitalWrite(H2D, 1);
-    analogWrite(H1E, pwm);
-    analogWrite(H2E, 0);   
-    break; 
-
-  case 5:
-    pwm = (pwm >> 1) + (pwm >> 3);
-    digitalWrite(H1D, 1);
-    digitalWrite(H2D, 0);
-    analogWrite(H1E, pwm);
-    analogWrite(H2E, pwm); 
-    break;
-
-  case 4:
-    digitalWrite(H1D, 1);
-    digitalWrite(H2D, 0);
-    analogWrite(H1E, 0);
-    analogWrite(H2E, pwm); 
-    break;
-
-  case 3:
-    pwm = (pwm >> 1) + (pwm >> 3);
-    digitalWrite(H1D, 0);
-    digitalWrite(H2D, 0);
-    analogWrite(H1E, pwm);
-    analogWrite(H2E, pwm); 
-    break; 
-
-  case 2:
-    digitalWrite(H1D, 0);
-    digitalWrite(H2D, 0);
-    analogWrite(H1E, pwm);
-    analogWrite(H2E, 0); 
-    break;
-
-  case 1:
-    pwm = (pwm >> 1) + (pwm >> 3);
-    digitalWrite(H1D, 0);
-    digitalWrite(H2D, 1);
-    analogWrite(H1E, pwm);
-    analogWrite(H2E, pwm); 
-    break;
-
-  case 0:
-    digitalWrite(H1D, 0);
-    digitalWrite(H2D, 1);
-    analogWrite(H1E, 0);
-    analogWrite(H2E, pwm); 
-    break; 
-
-  }
-#endif
-}
 
 
 void extruder::enableStep()
 {
-  // Nothing to do here - step() automatically enables the stepper drivers appropriately.  
+    
 }
 
 void extruder::disableStep()
