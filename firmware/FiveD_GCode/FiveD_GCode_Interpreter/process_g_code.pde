@@ -562,15 +562,6 @@ void process_string(char instruction[], int size)
 				ex[extruder_in_use]->setCooler(0);
 				break;
 
-/*  Now all done with M113
-			//set PWM to extruder stepper
-			case 108:
-#if MOTHERBOARD > 1
-				if (gc.seen & GCODE_S)
-                                        ex[extruder_in_use]->setPWM((int)(255.0*gc.S + 0.5));
-#endif
-				break;
-*/
 
                         // Set the temperature and wait for it to get there
 			case 109:
@@ -592,13 +583,14 @@ void process_string(char instruction[], int size)
 			case 112:	// STOP!
                                {
                                  int a=50;
-                                while(a--)
+                                 while(a--)
                                   {blink(); delay(50);}
                                }
 				cancelAndClearQueue();
 				break;
 
 // If there's an S field, use that to set the PWM, otherwise use the pot.
+                       case 108:
                        case 113:
                                 #if MOTHERBOARD > 1
                                  if (gc.seen & GCODE_S)
@@ -620,12 +612,6 @@ void process_string(char instruction[], int size)
                                 Serial.println(where_i_am.e);
 				break;
 
-                        case 115:
-				if (gc.seen & GCODE_S)
-				{
-					ex[0]->setBedTemperature((int)gc.S);
-				}
-				break;
 
                         // TODO: make this work properly
                         case 116:
@@ -645,14 +631,26 @@ void process_string(char instruction[], int size)
                                 ex[extruder_in_use]->valveSet(false, (int)(gc.P + 0.5));
                                 break;
                                                                 
+                        case 140:
+				if (gc.seen & GCODE_S)
+				{
+					ex[0]->setBedTemperature((int)gc.S);
+				}
+				break;
+
+                        case 141: //TODO: set chamber temperature
+                                break;
+                                
+                        case 142: //TODO: set holding pressure
+                                break;                                
 
 			default:
 				if(SendDebug & DEBUG_ERRORS)
-                                  {
+                                {
                                   Serial.print("Huh? M");
 				  Serial.println(gc.M, DEC);
                                   FlushSerialRequestResend();
-                                  }
+                                }
 		}
 
                 
