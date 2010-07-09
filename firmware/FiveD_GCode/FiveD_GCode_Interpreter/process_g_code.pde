@@ -548,8 +548,10 @@ void process_string(char instruction[], int size)
 			case 105:
 				Serial.print("T:");
 				Serial.print(ex[extruder_in_use]->getTemperature());
+#if MOTHERBOARD > 1
                                 Serial.print(" B:");
                                 Serial.println(ex[0]->getBedTemperature());
+#endif                                
 				break;
 
 			//turn fan on
@@ -634,7 +636,9 @@ void process_string(char instruction[], int size)
                         case 140:
 				if (gc.seen & GCODE_S)
 				{
+#if MOTHERBOARD > 1
 					ex[0]->setBedTemperature((int)gc.S);
+#endif
 				}
 				break;
 

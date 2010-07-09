@@ -21,7 +21,15 @@
 // RepRap Motherboard with RS485 extruders: 2
 // Arduino Mega: 3
 
-#define MOTHERBOARD 2
+#define MOTHERBOARD 1
+
+// The width of Henry VIII's thumb (or something).
+
+#define INCHES_TO_MM 25.4 // *RO
+
+// The number of real extruders in this machine
+
+#define EXTRUDER_COUNT 2
 
 //*********************************************************************************************
 
@@ -29,8 +37,15 @@
 
 #if MOTHERBOARD == 1
 
-// Comment out this if you are using a thermocouple
+// Temperature measurement
+// Uncomment ONE of the next three
 #define USE_THERMISTOR
+//#define AD595_THERMOCOUPLE
+//#define MAX6675_THERMOCOUPLE
+
+// Uncomment the next line if this is driving a paste extruder
+//#define PASTE_EXTRUDER
+
 
 // Set to 1 if enable pins are inverting
 // For RepRap stepper boards version 1.x the enable pins are *not* inverting.
@@ -44,6 +59,27 @@
 #define X_ENDSTOP_INVERTING false
 #define Y_ENDSTOP_INVERTING false
 #define Z_ENDSTOP_INVERTING false
+
+#define X_STEPS_PER_MM   7.99735
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   7.99735
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   320
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Z_DIR 0
+
+// Stepper-driven extruder
+// E_STEPS_PER_MM is the number of steps needed to 
+// extrude 1mm out of the nozzle.  E0 for extruder 0;
+// E1 for extruder 1, and so on.
+
+//#define E_STEPS_PER_MM   0.9     // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+#define E0_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
+#define E1_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
 
 #endif
 
@@ -70,16 +106,34 @@
 #define Y_ENDSTOP_INVERTING true
 #define Z_ENDSTOP_INVERTING true
 
-// Does your machine have the older standard slotted pullyes (needing lots of motor shaft filing)
-// or the newer pulleys with grub screws?  Uncomment one of the two next lines.
-//#define SLOTTED_PULLEYS
-#define GRUB_PULLEYS
-
 #define MY_NAME 'H'           // Byte representing the name of this device
 #define E0_NAME '0'           // Byte representing the name of extruder 0
 #define E1_NAME '1'           // Byte representing the name of extruder 1
 
 #define RS485_MASTER  1       // *RO
+
+// Axis scaling in stepper-motor steps per mm of movement
+
+#define X_STEPS_PER_MM   10.047
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   10.047
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   833.398
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Z_DIR 0
+
+// Stepper-driven extruder
+// E_STEPS_PER_MM is the number of steps needed to 
+// extrude 1mm out of the nozzle.  E0 for extruder 0;
+// E1 for extruder 1, and so on.
+
+//#define E_STEPS_PER_MM   0.9     // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+#define E0_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
+#define E1_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
 
 #endif
 
@@ -107,10 +161,30 @@
 #define Y_ENDSTOP_INVERTING true
 #define Z_ENDSTOP_INVERTING true
 
-// Does your machine have the older standard slotted pullyes (needing lots of motor shaft filing)
-// or the newer pulleys with grub screws?  Uncomment one of the two next lines.
-//#define SLOTTED_PULLEYS
-#define GRUB_PULLEYS
+// Motherboard 3 driving Pololu microstepping controllers - 16 steps/step
+
+// Axis scaling in stepper-motor steps per mm of movement
+
+#define X_STEPS_PER_MM   80.376
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   80.376
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   6667.184
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define INVERT_Z_DIR 0
+
+// Stepper-driven extruder
+// E_STEPS_PER_MM is the number of steps needed to 
+// extrude 1mm out of the nozzle.  E0 for extruder 0;
+// E1 for extruder 1, and so on.
+
+//#define E_STEPS_PER_MM   0.9      // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+#define E0_STEPS_PER_MM   17.6      // NEMA 17 59/11 geared extruder 8mm diameter drive
+#define E1_STEPS_PER_MM   17.6      // NEMA 17 59/11 geared extruder 8mm diameter drive
 
 #endif
 
@@ -120,19 +194,11 @@
 
 #define HOST_BAUD 19200 // *RO
 
-// The number of real extruders
-
-#define EXTRUDER_COUNT 2
-
 // Set 1s where you have endstops; 0s where you don't
 // Both Darwin and Mendel have MIN endstops, but not MAX ones.
 
 #define ENDSTOPS_MIN_ENABLED 1
 #define ENDSTOPS_MAX_ENABLED 0
-
-// The width of Henry VIII's thumb (or something).
-
-#define INCHES_TO_MM 25.4 // *RO
 
 // The number of mm below which distances are insignificant (one tenth the
 // resolution of the machine is the default value).
@@ -143,74 +209,7 @@
 
 #define SMALL_DISTANCE2 (SMALL_DISTANCE*SMALL_DISTANCE) // *RO
 
-#ifdef MENDEL
-
-#ifdef SLOTTED_PULLEYS
-// define the XYZ parameters of Mendel - standard pulleys
-
-#define X_STEPS_PER_MM   10.047
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_X_DIR 0
-
-#define Y_STEPS_PER_MM   10.047
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Y_DIR 0
-
-#define Z_STEPS_PER_MM   833.398
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Z_DIR 0
-#endif
-
-#ifdef GRUB_PULLEYS
-// define the XYZ parameters of Mendel - grub-screw pulleys
-
-#define X_STEPS_PER_MM   10.047
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_X_DIR 0
-
-#define Y_STEPS_PER_MM   10.047
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Y_DIR 0
-
-#define Z_STEPS_PER_MM   833.398
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Z_DIR 0
-#endif
-
-#endif
-
-#if MOTHERBOARD == 1
-
-// This is for Darwin.
-
-#define X_STEPS_PER_MM   7.99735
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_X_DIR 0
-
-#define Y_STEPS_PER_MM   7.99735
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Y_DIR 0
-
-#define Z_STEPS_PER_MM   320
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Z_DIR 0
-
-#endif
-
-// For when we have a stepper-driven extruder
-// E_STEPS_PER_MM is the number of steps needed to 
-// extrude 1mm out of the nozzle.  E0 for extruder 0;
-// E1 for extruder 1, and so on.
-
-//#define E_STEPS_PER_MM   0.9 //0.706   // NEMA 17 extruder 5mm diameter drive - empirically adjusted
-
-//#define E_STEPS_PER_MM   2.2       // NEMA 14 geared extruder 8mm diameter drive
-#define E0_STEPS_PER_MM   2.0       // NEMA 17 55/11 geared extruder 8mm diameter drive
-#define E1_STEPS_PER_MM   2.0      // NEMA 17 55/11 geared extruder 8mm diameter drive
-
-//#define E0_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM) // *RO
-
-//our maximum feedrates
+//our maximum feedrates in mm/minute
 #define FAST_XY_FEEDRATE 3000.0
 #define FAST_Z_FEEDRATE  50.0
 

@@ -193,7 +193,7 @@
 
 #else
 
-#error Unknown MOTHERBOARD value in parameters.h
+#error Unknown MOTHERBOARD value in configuration.h
 
 #endif
 

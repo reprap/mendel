@@ -94,7 +94,7 @@ void extruder::temperatureError()
 
 #if MOTHERBOARD == 1 
 
-extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin)
+extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin, float spm)
 {
   motor_dir_pin = md_pin;
   motor_speed_pin = ms_pin;
@@ -104,7 +104,8 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
   valve_dir_pin = vd_pin;
   valve_en_pin = ve_pin;
   step_en_pin = se_pin;
-
+  sPerMM = spm;
+  
   //setup our pins
   pinMode(motor_dir_pin, OUTPUT);
   pinMode(motor_speed_pin, OUTPUT);

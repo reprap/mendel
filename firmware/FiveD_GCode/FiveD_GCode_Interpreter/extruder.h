@@ -23,13 +23,15 @@ void newExtruder(byte e);
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
 
+#define TEMPERATURE_SAMPLES 3
+
 class extruder
 {
 
      
 public:
 
-   extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin);
+   extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin, float spm);
    void waitForTemperature();
    void valveSet(bool open, int dTime);
    void setDirection(bool direction);
@@ -47,7 +49,8 @@ public:
    void disableStep();
    
    void shutdown();
-   
+   float stepsPerMM();
+      
 private:
 
 //these our the default values for the extruder.
@@ -58,6 +61,7 @@ private:
     byte heater_high;
     byte heater_current;
     int extrude_step_count;
+    float sPerMM;
 
 // These are used for temperature control    
     byte count ;
@@ -199,10 +203,6 @@ inline extruder::extruder(char name, float spm)
   stp = false;
 }
 
-inline float extruder::stepsPerMM()
-{
-  return sPerMM;
-}
 
 inline void extruder::buildCommand(char c)
 {
@@ -474,5 +474,10 @@ private:
 
 extern extruder* ex[ ];
 extern byte extruder_in_use;
+
+inline float extruder::stepsPerMM()
+{
+  return sPerMM;
+}
 
 #endif
