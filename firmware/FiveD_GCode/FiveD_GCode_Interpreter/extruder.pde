@@ -51,7 +51,7 @@ void extruder::waitForTemperature()
     if(count > 5)
     {
       newT = newT/5;
-      if(newT >= target_celsius - HALF_DEAD_ZONE)
+      if(newT >= targetTemperature - HALF_DEAD_ZONE)
       {
         warming = false;
         if(seconds > WAIT_AT_TEMPERATURE)
@@ -306,6 +306,8 @@ void extruder::manage()
  */
 #if MOTHERBOARD == 3
 
+static PIDcontrol ePID(EXTRUDER_0_HEATER_PIN, EXTRUDER_0_TEMPERATURE_PIN, false);
+
 // With thanks to Adam at Makerbot and Tim at BotHacker
 // see http://blog.makerbot.com/2009/10/01/open-source-ftw/
 
@@ -437,61 +439,8 @@ void PIDcontrol::pidCalculation(int target)
   analogWrite(heat_pin, output);
 }
 
+//*******************************************************************************************
 
-extruder::extruder(byte step, byte dir, byte en, byte heat, byte temp)
-{
-  motor_step_pin = step;
-  motor_dir_pin = dir;
-  motor_en_pin = en;
-  heater_pin = heat;
-  temp_pin = temp;
-  
-  //fan_pin = ;
-
-  //setup our pins
-  pinMode(motor_step_pin, OUTPUT);
-  pinMode(motor_dir_pin, OUTPUT);
-  pinMode(motor_en_pin, OUTPUT);
-  pinMode(heater_pin, OUTPUT);
-  pinMode(temp_pin, INPUT);
-
-  //initialize values
-  digitalWrite(motor_dir_pin, EXTRUDER_FORWARD);
-
-  analogWrite(heater_pin, 0);
-
-  disableStep();
-
-  //these our the default values for the extruder.
-
-  target_celsius = 0;
-//  max_celsius = 0;
-//  heater_low = 64;
-//  heater_high = 255;
-//  heater_current = 0;
-
-
-  //this is for doing encoder based extruder control
-  //        rpm = 0;
-  //        e_delay = 0;
-  //        error = 0;
-  //        last_extruder_error = 0;
-  //        error_delta = 0;
-//  e_direction = EXTRUDER_FORWARD;
-
-  //default to cool
-  setTemperature(target_celsius);
-  
-#ifdef PASTE_EXTRUDER
-  valve_dir_pin = vd_pin;
-  valve_en_pin = ve_pin;
-  pinMode(valve_dir_pin, OUTPUT); 
-  pinMode(valve_en_pin, OUTPUT);
-  digitalWrite(valve_dir_pin, false);
-  digitalWrite(valve_en_pin, 0);
-  valve_open = false;
-#endif
-}
 
 #if 0
 void extruder::shutdown()
@@ -660,6 +609,69 @@ extruder::extruder()
 }
 #endif
 
+//*******************************************************************************************
+
+extruder::extruder(byte stp, byte dir, byte en, byte heat, byte temp, float spm)
+{
+  motor_step_pin = stp;
+  motor_dir_pin = dir;
+  motor_en_pin = en;
+  heater_pin = heat;
+  temp_pin = temp;
+  sPerMM = spm;
+  manageCount = 0;
+  extruderPID = &ePID;
+  
+  //fan_pin = ;
+
+  //setup our pins
+  pinMode(motor_step_pin, OUTPUT);
+  pinMode(motor_dir_pin, OUTPUT);
+  pinMode(motor_en_pin, OUTPUT);
+  pinMode(heater_pin, OUTPUT);
+  pinMode(temp_pin, INPUT);
+  
+  disableStep();
+
+  //initialize values
+  digitalWrite(motor_dir_pin, 1);
+  digitalWrite(motor_step_pin, 0);
+  
+  analogWrite(heater_pin, 0);
+
+
+
+  //these our the default values for the extruder.
+
+  targetTemperature = 0;
+//  max_celsius = 0;
+//  heater_low = 64;
+//  heater_high = 255;
+//  heater_current = 0;
+
+
+  //this is for doing encoder based extruder control
+  //        rpm = 0;
+  //        e_delay = 0;
+  //        error = 0;
+  //        last_extruder_error = 0;
+  //        error_delta = 0;
+//  e_direction = EXTRUDER_FORWARD;
+
+  //default to cool
+  setTemperature(targetTemperature);
+  
+#ifdef PASTE_EXTRUDER
+  valve_dir_pin = vd_pin;
+  valve_en_pin = ve_pin;
+  pinMode(valve_dir_pin, OUTPUT); 
+  pinMode(valve_en_pin, OUTPUT);
+  digitalWrite(valve_dir_pin, false);
+  digitalWrite(valve_en_pin, 0);
+  valve_open = false;
+#endif
+}
+
 void extruder::controlTemperature()
 {   
   extruderPID->pidCalculation(targetTemperature);
@@ -720,15 +732,11 @@ void extruder::shutdown()
   // Motor off
   disableStep();
   // Close valve
-  valveSet(true);
+  valveSet(false, 500);
 }
 
-void extruder::waitForTemperature()
-{
 
-}
-
-void extruder::valveSet(bool closed)
+void extruder::valveSet(bool closed, int dTime)
 {
 #ifdef PASTE_EXTRUDER
   requiredValveState = closed;
@@ -769,39 +777,47 @@ int extruder::getBedTemperature()
 
 */
 
-
+void extruder::sStep()
+{
+	digitalWrite(motor_step_pin, HIGH);
+	delayMicrosecondsInterruptible(5);
+	digitalWrite(motor_step_pin, LOW);  
+}
 
 void extruder::enableStep()
 {
-    
+    digitalWrite(motor_en_pin, 0);
 }
 
 void extruder::disableStep()
 {
-  analogWrite(H1E, 0);
-  analogWrite(H2E, 0);  
+  digitalWrite(motor_en_pin, 1); 
 }
 
+/*
 int extruder::potVoltage()
 {
   return (int)analogRead(POT);  
-}
+}*/
 
+/*
 void extruder::setPWM(int p)
 {
   pwmValue = p;
   usePot = false;
   sStep(1);
   sStep(2);
-}
+}*/
 
+/*
 void extruder::usePotForMotor()
 {
   usePot = true;
   sStep(1);
   sStep(2);
-}
+}*/
 
+/*
 char* extruder::processCommand(char command[])
 {
   reply[0] = 0;
@@ -875,6 +891,7 @@ char* extruder::processCommand(char command[])
   }
   return reply; 
 }
+*/
 
 #ifdef PASTE_EXTRUDER
 

@@ -177,7 +177,7 @@ public:
 private:
 
    char my_name;
-   int target_celsius;
+   int targetTemperature;
    int count;
    int oldT, newT;
    char commandBuffer[RS485_BUF_LEN];
@@ -245,7 +245,7 @@ inline  void extruder::setCooler(byte e_speed)
 
 inline  void extruder::setTemperature(int temp)
 {
-   target_celsius = temp;
+   targetTemperature = temp;
    buildNumberCommand(SET_T, temp);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer); 
 }
@@ -259,7 +259,7 @@ inline  int extruder::getTemperature()
 
 inline  void extruder::setBedTemperature(int temp)
 {
-   target_celsius = temp;
+   //target_celsius = temp;
    buildNumberCommand(SET_BED_T, temp);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer); 
 }
@@ -411,35 +411,41 @@ class extruder
 {
   
 public:
-   extruder(byte step, byte dir, byte en, byte heat, byte temp);
+   extruder(byte step, byte dir, byte en, byte heat, byte temp, float spm);
    void waitForTemperature();
    void valveSet(bool open, int dTime);
    void setDirection(bool direction);
    void setCooler(byte e_speed);
    void setTemperature(int temp);
-//   int getBedTemperature();
-//   void setBedTemperature(int temp);
+   //int getBedTemperature();
+   //void setBedTemperature(int temp);
    int getTemperature();
+   void slowManage();
    void manage();
    void sStep();
    void enableStep();
    void disableStep();
-   int potVoltage();
-   void setPWM(int p);
-   void usePotForMotor();
+   //int potVoltage();
+   //void setPWM(int p);
+   //void usePotForMotor();
    void shutdown();
    bool ping();
    float stepsPerMM();
+   void controlTemperature();
  
 private:
 
-   int target_celsius;
+   //int target_celsius;
+   int targetTemperature;
    int count;
    int oldT, newT;
    bool stp;
    float sPerMM;
+   long manageCount;
    
-    int target_celsius;
+   PIDcontrol* extruderPID;    // Temperature control - extruder...
+   
+//    int target_celsius;
 //    int max_celsius;
 //    byte heater_low;
 //    byte heater_high;

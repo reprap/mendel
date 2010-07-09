@@ -548,10 +548,15 @@ void process_string(char instruction[], int size)
 			case 105:
 				Serial.print("T:");
 				Serial.print(ex[extruder_in_use]->getTemperature());
-#if MOTHERBOARD > 1
+#if MOTHERBOARD == 2
                                 Serial.print(" B:");
                                 Serial.println(ex[0]->getBedTemperature());
-#endif                                
+#endif
+#if MOTHERBOARD == 3
+                                Serial.print(" B:");
+                                Serial.println("0"); // TODO: bed temp needed
+#endif
+
 				break;
 
 			//turn fan on
@@ -594,7 +599,7 @@ void process_string(char instruction[], int size)
 // If there's an S field, use that to set the PWM, otherwise use the pot.
                        case 108:
                        case 113:
-                                #if MOTHERBOARD > 1
+                                #if MOTHERBOARD == 2
                                  if (gc.seen & GCODE_S)
                                      ex[extruder_in_use]->setPWM((int)(255.0*gc.S + 0.5));
                                   else
@@ -636,10 +641,13 @@ void process_string(char instruction[], int size)
                         case 140:
 				if (gc.seen & GCODE_S)
 				{
-#if MOTHERBOARD > 1
+#if MOTHERBOARD == 2
 					ex[0]->setBedTemperature((int)gc.S);
 #endif
-				}
+#if MOTHERBOARD == 3
+					// TODO: setBedTemperature((int)gc.S);
+#endif				
+                                }
 				break;
 
                         case 141: //TODO: set chamber temperature
