@@ -551,8 +551,7 @@ void process_string(char instruction[], int size)
 #if MOTHERBOARD == 2
                                 Serial.print(" B:");
                                 Serial.println(ex[0]->getBedTemperature());
-#endif
-#if MOTHERBOARD == 3
+#else
                                 Serial.print(" B:");
                                 Serial.println("0"); // TODO: bed temp needed
 #endif
