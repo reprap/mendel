@@ -55,7 +55,7 @@ private:
 
 //these our the default values for the extruder.
     byte e_speed;
-    int target_celsius;
+    int targetTemperature;
     int max_celsius;
     byte heater_low;
     byte heater_high;

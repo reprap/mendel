@@ -139,7 +139,7 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
 
   //these our the default values for the extruder.
   e_speed = 0;
-  target_celsius = 0;
+  targetTemperature = 0;
   max_celsius = 0;
   heater_low = 64;
   heater_high = 255;
@@ -155,7 +155,7 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
   e_direction = EXTRUDER_FORWARD;
 
   //default to cool
-  setTemperature(target_celsius);
+  setTemperature(targetTemperature);
 }
 
 void extruder::shutdown()
@@ -205,7 +205,7 @@ void extruder::valveSet(bool open, int dTime)
 
 void extruder::setTemperature(int temp)
 {
-  target_celsius = temp;
+  targetTemperature = temp;
   max_celsius = (temp*11)/10;
 
   // If we've turned the heat off, we might as well disable the extrude stepper
@@ -284,7 +284,7 @@ void extruder::manage()
   byte newheat = 0;
 
   //put the heater into high mode if we're not at our target.
-  if (current_celsius < target_celsius)
+  if (current_celsius < targetTemperature)
     newheat = heater_high;
   //put the heater on low if we're at our target.
   else if (current_celsius < max_celsius)
