@@ -413,62 +413,45 @@ class extruder
 public:
    extruder(byte step, byte dir, byte en, byte heat, byte temp, float spm);
    void waitForTemperature();
-   void valveSet(bool open, int dTime);
+   
    void setDirection(bool direction);
    void setCooler(byte e_speed);
    void setTemperature(int temp);
-   //int getBedTemperature();
-   //void setBedTemperature(int temp);
    int getTemperature();
    void slowManage();
    void manage();
    void sStep();
    void enableStep();
    void disableStep();
-   //int potVoltage();
-   //void setPWM(int p);
-   //void usePotForMotor();
    void shutdown();
-   bool ping();
    float stepsPerMM();
-   void controlTemperature();
+   void controlTemperature();   
+   void valveSet(bool open, int dTime); 
  
 private:
 
-   //int target_celsius;
    int targetTemperature;
    int count;
    int oldT, newT;
-   bool stp;
    float sPerMM;
    long manageCount;
    
    PIDcontrol* extruderPID;    // Temperature control - extruder...
    
-//    int target_celsius;
-//    int max_celsius;
-//    byte heater_low;
-//    byte heater_high;
-//    byte heater_current;
-//    int extrude_step_count;
+   byte wait_till_hot();
+   //byte wait_till_cool(); 
+   int sampleTemperature();
 
-    bool e_direction;
-
-    
-    byte wait_till_hot();
-    //byte wait_till_cool(); 
-    int sampleTemperature();
-
-    void temperatureError(); 
+   void temperatureError(); 
 
 // The pins we control
-    byte motor_step_pin, motor_dir_pin, heater_pin,  temp_pin,  motor_en_pin;
+   byte motor_step_pin, motor_dir_pin, heater_pin,  temp_pin,  motor_en_pin;
 
-    //byte fan_pin;
+   //byte fan_pin;
     
 #ifdef PASTE_EXTRUDER
-    byte valve_dir_pin, valve_en_pin;
-    bool valve_open;
+   byte valve_dir_pin, valve_en_pin;
+   bool valve_open;
 #endif
     
  

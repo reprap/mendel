@@ -161,7 +161,7 @@
 #define Y_ENDSTOP_INVERTING true
 #define Z_ENDSTOP_INVERTING true
 
-// Motherboard 3 driving Pololu microstepping controllers - 16 steps/step
+// Motherboard 3 driving Pololu microstepping controllers - 16 microsteps
 
 // Axis scaling in stepper-motor steps per mm of movement
 
@@ -175,7 +175,7 @@
 
 #define Z_STEPS_PER_MM   6667.184
 #define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Z_DIR 0
+#define INVERT_Z_DIR 1
 
 // Stepper-driven extruder
 // E_STEPS_PER_MM is the number of steps needed to 
