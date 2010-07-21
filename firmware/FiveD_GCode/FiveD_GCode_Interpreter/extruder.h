@@ -360,51 +360,6 @@ inline bool extruder::ping()
 
 //******************************************************************************************************
 
-// PID definitions
-
-#define TEMP_PID_INTEGRAL_DRIVE_MAX 110
-#define TEMP_PID_PGAIN 5.0
-#define TEMP_PID_IGAIN 0.1
-#define TEMP_PID_DGAIN 100.0
-
-class PIDcontrol
-{
-  
-private:
-
-  volatile int iState; // Integrator state
-  volatile int dState; // Last position input
-  unsigned long previousTime; // ms
-  unsigned long time;
-  int dt;
-  float pGain;
-  float iGain;
-  float dGain;
-  int temp_dState;
-  long temp_iState;
-  float temp_iState_max;
-  float temp_iState_min;
-  int output;
-  int error;
-  float pTerm, iTerm, dTerm;
-  byte heat_pin, temp_pin;
-  bool bedTable;
-  int currentTemperature;
-  
-public:
-
-  PIDcontrol(byte hp, byte tp, bool b);
-  void internalTemperature(short table[][2]);
-  void pidCalculation(int target);
-  int temperature();
-  
-};
-
-inline int PIDcontrol::temperature() 
-{ 
-  return currentTemperature; 
-}
-
 
 
 class extruder

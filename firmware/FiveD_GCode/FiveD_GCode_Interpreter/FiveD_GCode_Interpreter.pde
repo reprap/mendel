@@ -6,6 +6,8 @@
 #include "configuration.h"
 #include "intercom.h"
 #include "pins.h"
+#include "Temperature.h"
+#include "pid.h"
 #include "extruder.h"
 #include "cartesian_dda.h"
 
@@ -21,7 +23,6 @@ http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 
 */
 
-// Yep, this is actually -*- c++ -*-
 
 // Sanguino G-code Interpreter
 // Arduino v1.0 by Mike Ellery - initial software (mellery@gmail.com)

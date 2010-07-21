@@ -189,7 +189,7 @@
 // The temperature routines get called each time the main loop
 // has gone round this many times
 
-#define SLOW_CLOCK 5000
+#define SLOW_CLOCK 2000
 
 #endif
 
