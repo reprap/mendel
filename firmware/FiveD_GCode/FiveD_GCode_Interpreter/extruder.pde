@@ -420,6 +420,7 @@ void extruder::setCooler(byte e_speed)
 
 void extruder::setTemperature(int tp)
 {
+  extruderPID->reset();
   targetTemperature = tp;
 }
 

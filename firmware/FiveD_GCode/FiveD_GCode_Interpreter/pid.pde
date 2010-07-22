@@ -2,8 +2,8 @@
 
 #if MOTHERBOARD != 2
 
-// With thanks to Adam at Makerbot and Tim at BotHacker
-// see http://blog.makerbot.com/2009/10/01/open-source-ftw/
+// Based on the excellent Wikipedia PID control article.
+// See http://en.wikipedia.org/wiki/PID_controller
 
 PIDcontrol::PIDcontrol(byte hp, byte tp, bool b)
 {
@@ -13,17 +13,24 @@ PIDcontrol::PIDcontrol(byte hp, byte tp, bool b)
    pGain = TEMP_PID_PGAIN;
    iGain = TEMP_PID_IGAIN;
    dGain = TEMP_PID_DGAIN;
-   temp_iState = 0;
-   temp_dState = 0;
-   temp_iState_min = -TEMP_PID_INTEGRAL_DRIVE_MAX/iGain;
-   temp_iState_max = TEMP_PID_INTEGRAL_DRIVE_MAX/iGain;
-   iState = 0;
-   dState = 0;
-   previousTime = millis();
-   output = 0;
    currentTemperature = 0;
+   reset();
    pinMode(heat_pin, OUTPUT);
    pinMode(temp_pin, INPUT); 
+}
+
+/*
+ Reset the PID to, for example, remove accumulated integral error from
+ a long period when the heater was off and the requested temperature was 0 (which it
+ won't go down to, even with the heater off, so the integral error grows).  Call this 
+ whenever you change the target value.
+*/
+
+void PIDcontrol::reset()
+{
+   previousTime = millis();
+   previousError = 0;
+   integral = 0;  
 }
 
 /* 
@@ -115,28 +122,17 @@ void PIDcontrol::pidCalculation(int target)
   else
     internalTemperature(temptable);
   time = millis();
-  dt = time - previousTime;
+  float dt = 0.001*(float)(time - previousTime);
   previousTime = time;
   if (dt <= 0) // Don't do it when millis() has rolled over
     return;
     
-
-
-    
-  error = target - currentTemperature;
-
-  pTerm = pGain * error;
-
-  temp_iState += error;
-  temp_iState = constrain(temp_iState, temp_iState_min, temp_iState_max);
-  iTerm = iGain * temp_iState;
-
-  dTerm = dGain * (currentTemperature - temp_dState);
-  temp_dState = currentTemperature;
-
-  output = pTerm + iTerm - dTerm;
+  float error = (float)(target - currentTemperature);
+  integral += error*dt;
+  float derivative = (error - previousError)/dt;
+  previousError = error;
+  int output = (int)(error*pGain + integral*iGain + derivative*dGain);
   output = constrain(output, 0, 255);
-
   analogWrite(heat_pin, output);
 }
 

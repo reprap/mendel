@@ -1,38 +1,32 @@
 #ifndef PID_H
 #define PID_H
 
+// Based on the excellent Wikipedia PID control article.
+// See http://en.wikipedia.org/wiki/PID_controller
+
 #if MOTHERBOARD != 2
 
-// PID definitions
+// PID gains.  These are about right for a brass extruder about 8 mm 
+// in diameter and 30 mm long heated by a 6 ohm coil with a 12v supply.
 
-#define TEMP_PID_INTEGRAL_DRIVE_MAX 110
-#define TEMP_PID_PGAIN 25.0 //3.0 // 5.0
-#define TEMP_PID_IGAIN 30.0 //1.0 // 0.1
-#define TEMP_PID_DGAIN 15.0 // 100.0
+#define TEMP_PID_PGAIN 2
+#define TEMP_PID_IGAIN 0.07
+#define TEMP_PID_DGAIN 1
 
 class PIDcontrol
 {
   
 private:
 
-  volatile int iState; // Integrator state
-  volatile int dState; // Last position input
   bool doingBed;
   unsigned long previousTime; // ms
   unsigned long time;
-  int dt;
+  float previousError;
+  float integral;
   float pGain;
   float iGain;
   float dGain;
-  int temp_dState;
-  long temp_iState;
-  float temp_iState_max;
-  float temp_iState_min;
-  int output;
-  int error;
-  float pTerm, iTerm, dTerm;
   byte heat_pin, temp_pin;
-//  bool bedTable;
   int currentTemperature;
  
   void internalTemperature(short table[][2]); 
@@ -40,6 +34,7 @@ private:
 public:
 
   PIDcontrol(byte hp, byte tp, bool b);
+  void reset();
   void pidCalculation(int target);
   void shutdown();
   int temperature();
