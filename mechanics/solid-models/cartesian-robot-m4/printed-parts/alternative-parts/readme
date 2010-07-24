@@ -12,4 +12,8 @@ These Mendel pulleys use an M3 grub screw and a captive nut. The advantage over 
 xaxis-motorbracket_1off
 
 An alternative motor bracket for the axis.  Removes the need for the x axis spacers, and also the belt follows a smoother path.  If using this reduce the length of the x axis smooth rod to 456mm.
-  
+
+xlr-power-bracket
+
+This part allows you to mount an XLR power connector onto Mendel when you don't have the standard stepper-motor controller carrier board in the machine (for example, if you are using the Pololu electronics: http://reprap.org/wiki/Pololu_Electronics).
+
