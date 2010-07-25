@@ -5,14 +5,7 @@
 #include "intercom.h"
 #include "extruder.h" 
 
-// Keep all extruders up to temperature etc.
 
-
-void manageAllExtruders()
-{
-  for(byte i = 0; i < EXTRUDER_COUNT; i++)
-    ex[i]->manage();
-}
 
 // Select a new extruder
 
@@ -75,7 +68,7 @@ void extruder::waitForTemperature()
     }
     for(int i = 0; i < 1000; i++)
     {
-      manageAllExtruders();
+      manage();
       delay(1);
     }
   }
@@ -166,32 +159,6 @@ void extruder::shutdown()
   digitalWrite(step_en_pin, !ENABLE_ON);
   valveSet(false, 500);
 }
-
-
-/*
-byte extruder::wait_till_cool()
- {  
- count = 0;
- oldT = get_temperature();
- while (get_temperature() > target_celsius + HALF_DEAD_ZONE)
- {
- 	manage_all_extruders();
- count++;
- if(count > 20)
- {
- newT = get_temperature();
- if(newT < oldT)
- oldT = newT;
- else
- return 1;
- count = 0;
- }
- 	delay(1000);
- }
- return 0;
- }
- */
-
 
 
 void extruder::valveSet(bool open, int dTime)

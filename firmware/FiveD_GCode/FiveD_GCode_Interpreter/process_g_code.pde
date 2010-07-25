@@ -553,7 +553,7 @@ void process_string(char instruction[], int size)
                                 Serial.println(ex[0]->getBedTemperature());
 #else
                                 Serial.print(" B:");
-                                Serial.println("0"); // TODO: bed temp needed
+                                Serial.println(heatedBed.getTemperature()); // TODO: bed temp needed
 #endif
 
 				break;
@@ -644,7 +644,7 @@ void process_string(char instruction[], int size)
 					ex[0]->setBedTemperature((int)gc.S);
 #endif
 #if MOTHERBOARD == 3
-					// TODO: setBedTemperature((int)gc.S);
+					heatedBed.setTemperature((int)gc.S);
 #endif				
                                 }
 				break;

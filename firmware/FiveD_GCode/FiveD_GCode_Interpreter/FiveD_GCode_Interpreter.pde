@@ -8,6 +8,7 @@
 #include "pins.h"
 #include "Temperature.h"
 #include "pid.h"
+#include "bed.h"
 #include "extruder.h"
 #include "cartesian_dda.h"
 
@@ -91,6 +92,8 @@ static extruder ex1(EXTRUDER_1_STEP_PIN, EXTRUDER_1_DIR_PIN, EXTRUDER_1_ENABLE_P
 static extruder ex0(EXTRUDER_0_STEP_PIN, EXTRUDER_0_DIR_PIN, EXTRUDER_0_ENABLE_PIN, EXTRUDER_0_HEATER_PIN, EXTRUDER_0_TEMPERATURE_PIN, E0_STEPS_PER_MM); 
 
 #endif
+
+static bed heatedBed(BED_HEATER_PIN, BED_TEMPERATURE_PIN);
 
 // Each entry in the buffer is an instance of cartesian_dda.
 
@@ -217,12 +220,22 @@ void shutdown()
   for(;;); 
 }
 
+
+// Keep all extruders, bed, up to temperature etc.
+
+void manage()
+{
+  for(byte i = 0; i < EXTRUDER_COUNT; i++)
+    ex[i]->manage();
+  heatedBed.manage();  
+}
+
 //long count = 0;
 //int ct1 = 0;
 
 void loop()
 {
-   manageAllExtruders();
+   manage();
    get_and_do_command(); 
 #if MOTHERBOARD == 2
    talker.tick();

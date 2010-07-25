@@ -172,8 +172,8 @@
 
 // Heated bed
 
-#define BED_HEATER_PIN (byte)1
-#define BED_TEMPERATURE_PIN (byte)2 
+#define BED_HEATER_PIN (byte)3
+#define BED_TEMPERATURE_PIN (byte)1 
 
 
 //extruder pins
@@ -188,7 +188,7 @@
 #define EXTRUDER_1_DIR_PIN (byte)5
 #define EXTRUDER_1_ENABLE_PIN (byte)6
 #define EXTRUDER_1_HEATER_PIN (byte)13
-#define EXTRUDER_1_TEMPERATURE_PIN (byte)1 
+#define EXTRUDER_1_TEMPERATURE_PIN (byte)2 
 
 
 #else

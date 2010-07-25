@@ -393,8 +393,6 @@ private:
    
    PIDcontrol* extruderPID;    // Temperature control - extruder...
    
-   byte wait_till_hot();
-   //byte wait_till_cool(); 
    int sampleTemperature();
 
    void temperatureError(); 
