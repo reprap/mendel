@@ -1,4 +1,4 @@
-static PIDcontrol bPID(BED_HEATER_PIN, BED_TEMPERATURE_PIN, false);
+static PIDcontrol bPID(BED_HEATER_PIN, BED_TEMPERATURE_PIN, true);
 
 
 bed::bed(byte heat, byte temp)
