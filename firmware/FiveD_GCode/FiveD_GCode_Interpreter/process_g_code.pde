@@ -82,6 +82,9 @@ char cmdbuffer[COMMAND_SIZE];
 char c = '?';
 byte serial_count = 0;
 boolean comment = false;
+// Serial error buffer
+char seBuffer[100];
+
 FloatPoint fp;
 FloatPoint sp;
 
@@ -310,7 +313,21 @@ void process_string(char instruction[], int size)
           if( (bool)(gc.seen & GCODE_CHECKSUM) != (bool)(gc.seen & GCODE_N) )
           {
            if(SendDebug & DEBUG_ERRORS)
-             Serial.println("Serial Error:Recieved a LineNr code without a Checksum code or Checksum without LineNr");
+           {
+              if(gc.seen & GCODE_CHECKSUM)
+              {
+                Serial.print("Serial Error: checksum without line number. Checksum: ");
+                Serial.flush();
+                itoa(gc.Checksum, seBuffer, 10);
+                Serial.println(seBuffer);
+              } else
+              {
+                Serial.print("Serial Error: line number without checksum. Linenumber: ");
+                Serial.flush();
+                ltoa(gc.LastLineNrRecieved+1, seBuffer, 10);
+                Serial.println(seBuffer);                
+              }
+           }
            FlushSerialRequestResend();
            return;
           }
@@ -326,7 +343,19 @@ void process_string(char instruction[], int size)
             if(gc.Checksum != (int)checksum)
               {
               if(SendDebug & DEBUG_ERRORS)
-                Serial.println("Serial Error: checksum mismatch");
+              {
+                Serial.print("Serial Error: checksum mismatch.  Remote (");
+                Serial.flush();
+                itoa(gc.Checksum, seBuffer, 10);
+                Serial.print(seBuffer);
+                Serial.flush();
+                Serial.print(") not equal to local (");
+                Serial.flush();
+                itoa((int)checksum, seBuffer, 10);
+                Serial.print(seBuffer);
+                Serial.flush();
+                Serial.println(")");
+              }
               FlushSerialRequestResend();
               return;
               }
@@ -335,7 +364,19 @@ void process_string(char instruction[], int size)
             if(gc.N != gc.LastLineNrRecieved+1)
                 {
                 if(SendDebug & DEBUG_ERRORS)
-                  Serial.println("Serial Error: LineNr is not the last lineNr+1");
+                {
+                  Serial.print("Serial Error: Linenumber (");
+                  Serial.flush();
+                  itoa(gc.N, seBuffer, 10);
+                  Serial.print(seBuffer);
+                  Serial.flush();
+                  Serial.print(") is not last + 1 (");
+                  Serial.flush();
+                  itoa(gc.LastLineNrRecieved+1, seBuffer, 10);
+                  Serial.print(seBuffer);                  
+                  Serial.flush();
+                  Serial.println(")");
+                }
                 FlushSerialRequestResend();
                 return;
                 }
@@ -746,9 +787,9 @@ void setupGcodeProcessor()
 
 void FlushSerialRequestResend()
 {
-  char buffer[100]="Resend:";
-  ltoa(gc.LastLineNrRecieved+1, buffer+7, 10);
   Serial.flush();
-  Serial.println(buffer);
+  strcpy(seBuffer, "Resend:");
+  ltoa(gc.LastLineNrRecieved+1, seBuffer+7, 10);
+  Serial.println(seBuffer);
 }
 
