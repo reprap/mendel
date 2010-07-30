@@ -1,3 +1,11 @@
+
+/*
+ * This controld the heated bed (if any).
+ * In a standard Mendel (MOTHERBOARD == 2) this
+ * is done by an extruder controller.
+ */
+
+
 #if MOTHERBOARD != 2
 
 static PIDcontrol bPID(BED_HEATER_PIN, BED_TEMPERATURE_PIN, true);

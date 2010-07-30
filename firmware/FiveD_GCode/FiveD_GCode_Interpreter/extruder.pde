@@ -310,8 +310,6 @@ extruder::extruder(byte stp, byte dir, byte en, byte heat, byte temp, float spm)
   
   analogWrite(heater_pin, 0);
 
-
-
   //these our the default values for the extruder.
 
   targetTemperature = 0;
@@ -364,7 +362,6 @@ void extruder::shutdown()
   // Heater off;
   setTemperature(0);
   extruderPID->shutdown();
-  //setBedTemperature(0);
   // Motor off
   digitalWrite(motor_en_pin, !ENABLE_ON);
   // Close valve
@@ -382,7 +379,7 @@ void extruder::setDirection(bool direction)
 
 void extruder::setCooler(byte e_speed)
 {
-  //analogWrite(FAN_OUTPUT, e_speed);   
+  //analogWrite(fan_pin, e_speed);   
 }
 
 void extruder::setTemperature(int tp)

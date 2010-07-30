@@ -45,7 +45,7 @@ byte extruder_in_use = 0;
 
 // Text placed in this (terminated with 0) will be transmitted back to the host
 // along with the next G Code acknowledgement.
-char debugstring[100];
+char debugstring[COMMAND_SIZE];
 
 
 // Old Mothers...
@@ -254,7 +254,7 @@ inline void cancelAndClearQueue()
 {
 	tail = head;	// clear buffer
 	for(int i=0;i<BUFFER_SIZE;i++)
-		cdda[i]->kill();
+		cdda[i]->shutdown();
 }
 
 inline bool qFull()

@@ -111,7 +111,7 @@ public:
   
   // Kill - stop all activity and turn off steppers
   
-  void kill();
+  void shutdown();
   
 };
 
@@ -165,23 +165,7 @@ inline long cartesian_dda::calculate_feedrate_delay(const float& feedrate)
 	return round( (distance*60000000.0) / (feedrate*(float)total_steps) );	
 }
 
-/*
-inline bool cartesian_dda::read_switch(byte pin, bool inv)
-{
-	//dual read as crude debounce
 
-	if(inv)
-		return !digitalRead(pin) && !digitalRead(pin);
-	else
-		return digitalRead(pin) && digitalRead(pin);
-}
-
-		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction, X_ENDSTOP_INVERTING);
-		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction, Y_ENDSTOP_INVERTING);
-		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction, Z_ENDSTOP_INVERTING);
-                e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction, false);
-                f_can_step = can_step(-1, -1, current_steps.f, target_steps.f, f_direction, false);
-*/
 inline bool cartesian_dda::xCanStep(long current, long target, bool dir)
 {
 //stop us if we're on target

@@ -7,15 +7,12 @@
 #include <stdio.h>
 
 
-// Initialise X, Y and Z.  The extruder is initialized
-// separately.
-
 cartesian_dda::cartesian_dda()
 {
         live = false;
         nullmove = false;
         
-  // Default is going forward
+// Default is going forward
   
         x_direction = true;
         y_direction = true;
@@ -23,7 +20,7 @@ cartesian_dda::cartesian_dda()
         e_direction = true;
         f_direction = true;
         
-  // Default to the origin and not going anywhere
+// Default to the origin and not going anywhere
   
 	target_position.x = 0.0;
 	target_position.y = 0.0;
@@ -31,7 +28,6 @@ cartesian_dda::cartesian_dda()
 	target_position.e = 0.0;
         target_position.f = SLOW_XY_FEEDRATE;
 
-// TODO: why is this here, and not in satrtup()?
 // Set up the pin directions
   
 	pinMode(X_STEP_PIN, OUTPUT);
@@ -49,7 +45,7 @@ cartesian_dda::cartesian_dda()
 	pinMode(Z_ENABLE_PIN, OUTPUT);
 #endif
 
-  //turn the motors off at the start.
+//turn the motors off at the start.
 
 	disable_steppers();
 
@@ -185,12 +181,12 @@ void cartesian_dda::set_target(const FloatPoint& p)
         dda_counter.f = dda_counter.x;
   
         where_i_am = p;
-
-        //sprintf(debugstring, "%d %d %d", (int)current_steps.e, (int)target_steps.e, (int)delta_steps.e);
         
         return;        
 }
 
+// This function is called by an interrupt.  Consequently interrupts are off for the duration
+// of its execution.  Consequently it has to be as optimised and as fast as possible.
 
 void cartesian_dda::dda_step()
 {  
@@ -199,12 +195,6 @@ void cartesian_dda::dda_step()
 
   do
   {
-/*		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction, X_ENDSTOP_INVERTING);
-		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction, Y_ENDSTOP_INVERTING);
-		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction, Z_ENDSTOP_INVERTING);
-                e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction, false);
-                f_can_step = can_step(-1, -1, current_steps.f, target_steps.f, f_direction, false);
-*/
                 x_can_step = xCanStep(current_steps.x, target_steps.x, x_direction);
 		y_can_step = yCanStep(current_steps.y, target_steps.y, y_direction);
                 z_can_step = zCanStep(current_steps.z, target_steps.z, z_direction);
@@ -310,6 +300,7 @@ void cartesian_dda::dda_step()
                   setTimer(timestep);
                 }
                 feed_change = false;
+                
   } while (!real_move && f_can_step);
   
   live = (x_can_step || y_can_step || z_can_step  || e_can_step || f_can_step);
@@ -339,46 +330,46 @@ void cartesian_dda::dda_start()
   byte d = 1;
   	
 #if INVERT_X_DIR == 1
-	if(x_direction)
-            d = 0;
+  if(x_direction)
+    d = 0;
 #else
-	if(!x_direction)
-            d = 0;	
+  if(!x_direction)
+    d = 0;	
 #endif
-        digitalWrite(X_DIR_PIN, d);
+  digitalWrite(X_DIR_PIN, d);
         
-        d = 1;
+  d = 1;
     
 #if INVERT_Y_DIR == 1
-	if(y_direction)
-            d = 0;
+  if(y_direction)
+    d = 0;
 #else
-	if(!y_direction)
-            d = 0;	
+  if(!y_direction)
+    d = 0;	
 #endif
-        digitalWrite(Y_DIR_PIN, d);
+  digitalWrite(Y_DIR_PIN, d);
         
-        d = 1;
+  d = 1;
     
 #if INVERT_Z_DIR == 1
-	if(z_direction)
-            d = 0;
+  if(z_direction)
+     d = 0;
 #else
-	if(!z_direction)
-            d = 0;	
+  if(!z_direction)
+     d = 0;	
 #endif
-        digitalWrite(Z_DIR_PIN, d);
+  digitalWrite(Z_DIR_PIN, d);
 
 
-       ex[extruder_in_use]->setDirection(e_direction);
+  ex[extruder_in_use]->setDirection(e_direction);
   
-    //turn on steppers to start moving =)
+//turn on steppers to start moving =)
     
-	enable_steppers();
+  enable_steppers();
 
-        setTimer(DEFAULT_TICK);
-	live = true;
-        feed_change = true; // force timer setting on the first call to dda_step()
+  setTimer(DEFAULT_TICK);
+  live = true;
+  feed_change = true; // force timer setting on the first call to dda_step()
 }
 
 
@@ -387,7 +378,7 @@ void cartesian_dda::dda_start()
 void cartesian_dda::enable_steppers()
 {
 #if MOTHERBOARD > 0
- if(delta_steps.x)
+  if(delta_steps.x)
     digitalWrite(X_ENABLE_PIN, ENABLE_ON);
   if(delta_steps.y)    
     digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
@@ -419,7 +410,7 @@ void cartesian_dda::disable_steppers()
 #endif
 }
 
-void cartesian_dda::kill()
+void cartesian_dda::shutdown()
 {
   live = false;
   nullmove = false;

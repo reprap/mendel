@@ -1,3 +1,7 @@
+/*
+ * This controld the heated bed (if any).
+ */
+
 #ifndef BED_H
 #define BED_H
 
