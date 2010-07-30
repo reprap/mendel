@@ -178,16 +178,16 @@ GcodeParser gc;	/* string parse result */
 //init our string processing
 inline void init_process_string()
 {
-	serial_count = 0;
+  serial_count = 0;
   comment = false;
 }
 
 // Get a command and process it
 
 void get_and_do_command()
-{
-	//read in characters if we got them.
-	if (Serial.available())
+{         
+        c = ' ';
+        while(Serial.available() && c != '\n')
 	{
 		c = Serial.read();
                 blink();
@@ -210,11 +210,10 @@ void get_and_do_command()
 		  }
 
                 }
+                // Buffer overflow?
+                if(serial_count >= COMMAND_SIZE)
+                    init_process_string();
 	}
-
-        // Data runaway?
-        if(serial_count >= COMMAND_SIZE)
-          init_process_string();
 
 	//if we've got a real command, do it
 	if (serial_count && c == '\n')
@@ -225,7 +224,7 @@ void get_and_do_command()
                  if(SendDebug & DEBUG_ECHO)
                  {
                  Serial.print("Echo:");
-                 Serial.println(&cmdbuffer[0]);
+                 Serial.println(cmdbuffer);
                  }                
 		//process our command!
 		process_string(cmdbuffer, serial_count);
@@ -319,13 +318,19 @@ void process_string(char instruction[], int size)
                 Serial.print("Serial Error: checksum without line number. Checksum: ");
                 Serial.flush();
                 itoa(gc.Checksum, seBuffer, 10);
-                Serial.println(seBuffer);
+                Serial.print(seBuffer);
+                Serial.flush();
+                Serial.print(", line received: ");
+                Serial.println(instruction);
               } else
               {
                 Serial.print("Serial Error: line number without checksum. Linenumber: ");
                 Serial.flush();
                 ltoa(gc.LastLineNrRecieved+1, seBuffer, 10);
-                Serial.println(seBuffer);                
+                Serial.print(seBuffer);
+                Serial.flush();
+                Serial.print(", line received: ");
+                Serial.println(instruction);                
               }
            }
            FlushSerialRequestResend();
@@ -354,7 +359,9 @@ void process_string(char instruction[], int size)
                 itoa((int)checksum, seBuffer, 10);
                 Serial.print(seBuffer);
                 Serial.flush();
-                Serial.println(")");
+                Serial.print("), line received: ");
+                Serial.flush();
+                Serial.println(instruction);
               }
               FlushSerialRequestResend();
               return;
@@ -375,7 +382,8 @@ void process_string(char instruction[], int size)
                   itoa(gc.LastLineNrRecieved+1, seBuffer, 10);
                   Serial.print(seBuffer);                  
                   Serial.flush();
-                  Serial.println(")");
+                  Serial.print("), line received: ");
+                  Serial.println(instruction);
                 }
                 FlushSerialRequestResend();
                 return;

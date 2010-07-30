@@ -49,6 +49,7 @@ private:
   long timestep;               // microseconds
   bool nullmove;               // this move is zero length
   volatile bool real_move;     // Flag to know if we've changed something physical
+  volatile bool feed_change;   // Flag to know if feedrate has changed
   volatile bool live;          // Flag for when we're plotting a line
 
 // Internal functions that need not concern the user
@@ -62,11 +63,15 @@ private:
   
   // Can this axis step?
   
-  bool can_step(int min_pin, int max_pin, long current, long target, bool dir, bool inv);
+  bool xCanStep(long current, long target, bool dir);
+  bool yCanStep(long current, long target, bool dir);
+  bool zCanStep(long current, long target, bool dir);
+  bool eCanStep(long current, long target, bool dir);
+  bool fCanStep(long current, long target, bool dir);
   
   // Read a limit switch
   
-  bool read_switch(byte pin, bool inv);
+  //bool read_switch(byte pin, bool inv);
   
   // Work out the number of microseconds between steps
   
@@ -126,21 +131,21 @@ inline bool cartesian_dda::active()
 inline void cartesian_dda::do_x_step()
 {
 	digitalWrite(X_STEP_PIN, HIGH);
-	delayMicrosecondsInterruptible(5);
+	//delayMicrosecondsInterruptible(5);
 	digitalWrite(X_STEP_PIN, LOW);
 }
 
 inline void cartesian_dda::do_y_step()
 {
 	digitalWrite(Y_STEP_PIN, HIGH);
-	delayMicrosecondsInterruptible(5);
+	//delayMicrosecondsInterruptible(5);
 	digitalWrite(Y_STEP_PIN, LOW);
 }
 
 inline void cartesian_dda::do_z_step()
 {
 	digitalWrite(Z_STEP_PIN, HIGH);
-	delayMicrosecondsInterruptible(5);
+	//delayMicrosecondsInterruptible(5);
 	digitalWrite(Z_STEP_PIN, LOW);
 }
 
@@ -160,6 +165,7 @@ inline long cartesian_dda::calculate_feedrate_delay(const float& feedrate)
 	return round( (distance*60000000.0) / (feedrate*(float)total_steps) );	
 }
 
+/*
 inline bool cartesian_dda::read_switch(byte pin, bool inv)
 {
 	//dual read as crude debounce
@@ -170,4 +176,143 @@ inline bool cartesian_dda::read_switch(byte pin, bool inv)
 		return digitalRead(pin) && digitalRead(pin);
 }
 
+		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction, X_ENDSTOP_INVERTING);
+		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction, Y_ENDSTOP_INVERTING);
+		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction, Z_ENDSTOP_INVERTING);
+                e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction, false);
+                f_can_step = can_step(-1, -1, current_steps.f, target_steps.f, f_direction, false);
+*/
+inline bool cartesian_dda::xCanStep(long current, long target, bool dir)
+{
+//stop us if we're on target
+
+	if (target == current)
+		return false;
+
+//stop us if we're home and still going lower
+
+#if ENDSTOPS_MIN_ENABLED == 1
+//#if X_MIN_PIN >= 0
+#if X_ENDSTOP_INVERTING
+	if(!dir && !digitalRead(X_MIN_PIN) )
+		return false;
+#else
+	if(!dir && digitalRead(X_MIN_PIN) )
+		return false;
+#endif
+//#endif
+#endif
+
+//stop us if we're at max and still going higher
+
+#if ENDSTOPS_MAX_ENABLED == 1
+//#if X_MAX_PIN >= 0
+#if X_ENDSTOP_INVERTING
+	if(dir && !digitalRead(X_MAX_PIN) )
+		return false;
+#else
+	if(!dir && digitalRead(X_MAX_PIN) )
+		return false;
+#endif
+//#endif
+#endif
+
+// All OK - we can step
+  
+	return true;
+}
+
+inline bool cartesian_dda::yCanStep(long current, long target, bool dir)
+{
+//stop us if we're on target
+
+	if (target == current)
+		return false;
+
+//stop us if we're home and still going lower
+
+#if ENDSTOPS_MIN_ENABLED == 1
+//#if Y_MIN_PIN >= 0
+#if Y_ENDSTOP_INVERTING
+	if(!dir && !digitalRead(Y_MIN_PIN) )
+		return false;
+#else
+	if(!dir && digitalRead(Y_MIN_PIN) )
+		return false;
+#endif
+//#endif
+#endif
+
+//stop us if we're at max and still going higher
+
+#if ENDSTOPS_MAX_ENABLED == 1
+//#if Y_MAX_PIN >= 0
+#if Y_ENDSTOP_INVERTING
+	if(dir && !digitalRead(Y_MAX_PIN) )
+		return false;
+#else
+	if(!dir && digitalRead(Y_MAX_PIN) )
+		return false;
+#endif
+//#endif
+#endif
+
+// All OK - we can step
+  
+	return true;
+}
+
+inline bool cartesian_dda::zCanStep(long current, long target, bool dir)
+{
+//stop us if we're on target
+
+	if (target == current)
+		return false;
+
+//stop us if we're home and still going lower
+
+#if ENDSTOPS_MIN_ENABLED == 1
+//#if Z_MIN_PIN >= 0
+#if Z_ENDSTOP_INVERTING
+	if(!dir && !digitalRead(Z_MIN_PIN) )
+		return false;
+#else
+	if(!dir && digitalRead(Z_MIN_PIN) )
+		return false;
+#endif
+//#endif
+#endif
+
+//stop us if we're at max and still going higher
+
+#if ENDSTOPS_MAX_ENABLED == 1
+//#if Z_MAX_PIN >= 0
+#if Z_ENDSTOP_INVERTING
+	if(dir && !digitalRead(Z_MAX_PIN) )
+		return false;
+#else
+	if(!dir && digitalRead(Z_MAX_PIN) )
+		return false;
+#endif
+//#endif
+#endif
+
+// All OK - we can step
+  
+	return true;
+}
+
+inline bool cartesian_dda::eCanStep(long current, long target, bool dir)
+{
+//stop us if we're on target
+
+	return !(target == current);
+}
+
+inline bool cartesian_dda::fCanStep(long current, long target, bool dir)
+{
+//stop us if we're on target
+
+	return !(target == current);
+}
 #endif

@@ -199,11 +199,17 @@ void cartesian_dda::dda_step()
 
   do
   {
-		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction, X_ENDSTOP_INVERTING);
+/*		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction, X_ENDSTOP_INVERTING);
 		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction, Y_ENDSTOP_INVERTING);
 		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction, Z_ENDSTOP_INVERTING);
                 e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction, false);
                 f_can_step = can_step(-1, -1, current_steps.f, target_steps.f, f_direction, false);
+*/
+                x_can_step = xCanStep(current_steps.x, target_steps.x, x_direction);
+		y_can_step = yCanStep(current_steps.y, target_steps.y, y_direction);
+                z_can_step = zCanStep(current_steps.z, target_steps.z, z_direction);
+                e_can_step = eCanStep(current_steps.e, target_steps.e, e_direction);
+                f_can_step = fCanStep(current_steps.f, target_steps.f, f_direction);
                 
                 real_move = false;
                 
@@ -287,7 +293,9 @@ void cartesian_dda::dda_step()
 					current_steps.f++;
 				else
 					current_steps.f--;
-			}
+                                feed_change = true;
+			} else
+                                feed_change = false;
 		}
 
 				
@@ -295,7 +303,7 @@ void cartesian_dda::dda_step()
       // Use milli- or micro-seconds, as appropriate
       // If the only thing that changed was f keep looping
   
-                if(real_move)
+                if(real_move && feed_change)
                 {
                   timestep = t_scale*current_steps.f;
                   timestep = calculate_feedrate_delay((float) timestep);
@@ -369,43 +377,10 @@ void cartesian_dda::dda_start()
 
         setTimer(DEFAULT_TICK);
 	live = true;
+        feed_change = true;
 }
 
 
-bool cartesian_dda::can_step(int min_pin, int max_pin, long current, long target, bool dir, bool inv)
-{
-
-  //stop us if we're on target
-
-	if (target == current)
-		return false;
-
-#if ENDSTOPS_MIN_ENABLED == 1
-
-  //stop us if we're home and still going lower
-  
-	if(min_pin >= 0 && !dir)
-        {
-          if (read_switch(min_pin, inv) )
-		return false;
-        }
-#endif
-
-#if ENDSTOPS_MAX_ENABLED == 1
-
-  //stop us if we're at max and still going higher
-  
-	if(max_pin >= 0 && dir)
-        {
- 	    if (read_switch(max_pin, inv))
- 		return false;
-        }
-#endif
-
-  // All OK - we can step
-  
-	return true;
-}
 
 
 void cartesian_dda::enable_steppers()

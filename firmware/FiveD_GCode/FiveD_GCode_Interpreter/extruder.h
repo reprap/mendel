@@ -410,6 +410,14 @@ private:
  
 };
 
+inline void extruder::sStep()
+{
+	digitalWrite(motor_step_pin, HIGH);
+	//delayMicrosecondsInterruptible(5);
+	digitalWrite(motor_step_pin, LOW);  
+}
+
+
 #endif
 
 //*********************************************************************************************************

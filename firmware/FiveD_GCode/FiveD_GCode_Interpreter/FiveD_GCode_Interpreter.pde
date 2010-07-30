@@ -118,8 +118,7 @@ FloatPoint where_i_am;
 
 ISR(TIMER1_COMPA_vect)
 {
-  disableTimerInterrupt();
-  
+  //disableTimerInterrupt();
   interruptBlink++;
   if(interruptBlink == 0x280)
   {
@@ -133,7 +132,7 @@ ISR(TIMER1_COMPA_vect)
   else
       dQMove();
  
-  enableTimerInterrupt();
+  //enableTimerInterrupt();
 }
 
 void setup()
