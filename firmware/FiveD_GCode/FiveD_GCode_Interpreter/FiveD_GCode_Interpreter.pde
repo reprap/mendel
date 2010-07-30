@@ -50,7 +50,7 @@ char debugstring[100];
 
 // Old Mothers...
 
-#if MOTHERBOARD < 2
+#if MOTHERBOARD == 1
 
 // TODO: For some reason, if you declare the following two in the order ex0 ex1 then
 // ex0 won't drive its stepper.  They seem fine this way round though.  But that's got
@@ -64,7 +64,10 @@ static extruder ex1(EXTRUDER_1_MOTOR_DIR_PIN, EXTRUDER_1_MOTOR_SPEED_PIN , EXTRU
 
 static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
             EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
-            EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN, E0_STEPS_PER_MM);         
+            EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN, E0_STEPS_PER_MM);
+   
+static bed heatedBed(BED_HEATER_PIN, BED_TEMPERATURE_PIN);
+
 #endif
 
 // Standard Mendel
@@ -91,9 +94,9 @@ static extruder ex1(EXTRUDER_1_STEP_PIN, EXTRUDER_1_DIR_PIN, EXTRUDER_1_ENABLE_P
 
 static extruder ex0(EXTRUDER_0_STEP_PIN, EXTRUDER_0_DIR_PIN, EXTRUDER_0_ENABLE_PIN, EXTRUDER_0_HEATER_PIN, EXTRUDER_0_TEMPERATURE_PIN, E0_STEPS_PER_MM); 
 
-#endif
-
 static bed heatedBed(BED_HEATER_PIN, BED_TEMPERATURE_PIN);
+
+#endif
 
 // Each entry in the buffer is an instance of cartesian_dda.
 
@@ -226,7 +229,9 @@ void manage()
 {
   for(byte i = 0; i < EXTRUDER_COUNT; i++)
     ex[i]->manage();
-  heatedBed.manage();  
+#if MOTHERBOARD != 2    
+  heatedBed.manage();
+#endif  
 }
 
 //long count = 0;

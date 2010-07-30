@@ -309,6 +309,7 @@ void cartesian_dda::dda_step()
                   timestep = calculate_feedrate_delay((float) timestep);
                   setTimer(timestep);
                 }
+                feed_change = false;
   } while (!real_move && f_can_step);
   
   live = (x_can_step || y_can_step || z_can_step  || e_can_step || f_can_step);
@@ -377,7 +378,7 @@ void cartesian_dda::dda_start()
 
         setTimer(DEFAULT_TICK);
 	live = true;
-        feed_change = true;
+        feed_change = true; // force timer setting on the first call to dda_step()
 }
 
 

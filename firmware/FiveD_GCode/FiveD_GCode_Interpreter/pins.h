@@ -67,6 +67,11 @@
 #define Z_MAX_PIN (byte)1
 #define Z_ENABLE_PIN (byte)31
 
+// Heated bed - TODO: reassign these
+
+#define BED_HEATER_PIN (byte)3
+#define BED_TEMPERATURE_PIN (byte)1 
+
 
 //extruder pins
 #define EXTRUDER_0_MOTOR_SPEED_PIN   (byte)12

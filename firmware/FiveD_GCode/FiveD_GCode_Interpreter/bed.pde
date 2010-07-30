@@ -1,3 +1,5 @@
+#if MOTHERBOARD != 2
+
 static PIDcontrol bPID(BED_HEATER_PIN, BED_TEMPERATURE_PIN, true);
 
 
@@ -118,3 +120,5 @@ void bed::temperatureError()
   Serial.print("E: ");
   Serial.println(getTemperature());  
 }
+
+#endif

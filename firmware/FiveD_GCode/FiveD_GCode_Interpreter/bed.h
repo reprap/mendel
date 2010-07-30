@@ -1,6 +1,8 @@
 #ifndef BED_H
 #define BED_H
 
+#if MOTHERBOARD != 2  
+
 class bed
 {
   
@@ -22,7 +24,7 @@ private:
    long manageCount;
    
    PIDcontrol* bedPID;    // Temperature control - extruder...
-   
+
    int sampleTemperature();
    void controlTemperature();
    void temperatureError(); 
@@ -32,4 +34,5 @@ private:
  
 };
 
+#endif
 #endif
