@@ -83,7 +83,7 @@ char c = '?';
 byte serial_count = 0;
 boolean comment = false;
 // Serial error buffer
-char seBuffer[100];
+//char seBuffer[100];
 
 FloatPoint fp;
 FloatPoint sp;
@@ -222,10 +222,8 @@ void get_and_do_command()
                 cmdbuffer[serial_count] = 0;
                 
                  if(SendDebug & DEBUG_ECHO)
-                 {
-                 Serial.print("Echo:");
-                 Serial.println(cmdbuffer);
-                 }                
+                   sprintf(talkToHost.string(), "Echo: %s", cmdbuffer);
+                   
 		//process our command!
 		process_string(cmdbuffer, serial_count);
 
@@ -234,13 +232,16 @@ void get_and_do_command()
 
                 // Say we're ready for the next one
                 
-                if(debugstring[0] != 0 && (SendDebug & DEBUG_INFO))
+                talkToHost.sendMessage(SendDebug & DEBUG_INFO);
+                
+ /*               if(debugstring[0] != 0 && (SendDebug & DEBUG_INFO))
                 {
                   Serial.print("ok ");
                   Serial.println(debugstring);
                   debugstring[0] = 0;
                 } else
                   Serial.println("ok");
+*/
 	}
 }
 
@@ -314,31 +315,16 @@ void process_string(char instruction[], int size)
            if(SendDebug & DEBUG_ERRORS)
            {
               if(gc.seen & GCODE_CHECKSUM)
-              {
-                Serial.print("Serial Error: checksum without line number. Checksum: ");
-                Serial.flush();
-                itoa(gc.Checksum, seBuffer, 10);
-                Serial.print(seBuffer);
-                Serial.flush();
-                Serial.print(", line received: ");
-                Serial.println(instruction);
-              } else
-              {
-                Serial.print("Serial Error: line number without checksum. Linenumber: ");
-                Serial.flush();
-                ltoa(gc.LastLineNrRecieved+1, seBuffer, 10);
-                Serial.print(seBuffer);
-                Serial.flush();
-                Serial.print(", line received: ");
-                Serial.println(instruction);                
-              }
+                sprintf(talkToHost.string(), "Serial Error: checksum without line number. Checksum: %d, line received: %s", gc.Checksum, instruction);
+              else
+                sprintf(talkToHost.string(), "Serial Error: line number without checksum. Linenumber: %d, line received: %s", gc.N, instruction);
            }
-           FlushSerialRequestResend();
+           talkToHost.setResend(gc.LastLineNrRecieved+1);
            return;
           }
           // Check checksum of this string. Flush buffers and re-request line of error is found
           if(gc.seen & GCODE_CHECKSUM)  // if we recieved a line nr, we know we also recieved a Checksum, so check it
-            {
+          {
             // Calc checksum.
             byte checksum = 0;
             byte count=0;
@@ -346,48 +332,21 @@ void process_string(char instruction[], int size)
               checksum = checksum^instruction[count++];
             // Check checksum.
             if(gc.Checksum != (int)checksum)
-              {
+            {
               if(SendDebug & DEBUG_ERRORS)
-              {
-                Serial.print("Serial Error: checksum mismatch.  Remote (");
-                Serial.flush();
-                itoa(gc.Checksum, seBuffer, 10);
-                Serial.print(seBuffer);
-                Serial.flush();
-                Serial.print(") not equal to local (");
-                Serial.flush();
-                itoa((int)checksum, seBuffer, 10);
-                Serial.print(seBuffer);
-                Serial.flush();
-                Serial.print("), line received: ");
-                Serial.flush();
-                Serial.println(instruction);
-              }
-              FlushSerialRequestResend();
+                sprintf(talkToHost.string(), "Serial Error: checksum mismatch.  Remote (%d) not equal to local (%d), line received: %s", gc.Checksum, (int)checksum, instruction);
+              talkToHost.setResend(gc.LastLineNrRecieved+1);
               return;
-              }
+            }
           // Check that this lineNr is LastLineNrRecieved+1. If not, flush
           if(!( (bool)(gc.seen & GCODE_M) && gc.M == 110)) // unless this is a reset-lineNr command
             if(gc.N != gc.LastLineNrRecieved+1)
-                {
+            {
                 if(SendDebug & DEBUG_ERRORS)
-                {
-                  Serial.print("Serial Error: Linenumber (");
-                  Serial.flush();
-                  itoa(gc.N, seBuffer, 10);
-                  Serial.print(seBuffer);
-                  Serial.flush();
-                  Serial.print(") is not last + 1 (");
-                  Serial.flush();
-                  itoa(gc.LastLineNrRecieved+1, seBuffer, 10);
-                  Serial.print(seBuffer);                  
-                  Serial.flush();
-                  Serial.print("), line received: ");
-                  Serial.println(instruction);
-                }
-                FlushSerialRequestResend();
+                  sprintf(talkToHost.string(), "Serial Error: Linenumber (%d) is not last + 1 (%d), line received: %s", gc.N, gc.LastLineNrRecieved+1, instruction);
+                talkToHost.setResend(gc.LastLineNrRecieved+1);
                 return;
-                }
+            }
            //If we reach this point, communication is a succes, update our "last good line nr" and continue
            gc.LastLineNrRecieved = gc.N;
           }
@@ -532,11 +491,8 @@ void process_string(char instruction[], int size)
 
 			default:
 				if(SendDebug & DEBUG_ERRORS)
-                                {
-                                Serial.print("huh? G");
-				Serial.println(gc.G, DEC);
-                                FlushSerialRequestResend();
-                                }
+                                  sprintf(talkToHost.string(), "Dud G code: G%d", gc.G);
+                                talkToHost.setResend(gc.LastLineNrRecieved+1);
 		  }
 	}
 
@@ -595,16 +551,12 @@ void process_string(char instruction[], int size)
 
 			//custom code for temperature reading
 			case 105:
-				Serial.print("T:");
-				Serial.print(ex[extruder_in_use]->getTemperature());
+                                talkToHost.setETemp(ex[extruder_in_use]->getTemperature());
 #if MOTHERBOARD == 2
-                                Serial.print(" B:");
-                                Serial.println(ex[0]->getBedTemperature());
+                                talkToHost.setBTemp(ex[0]->getBedTemperature());
 #else
-                                Serial.print(" B:");
-                                Serial.println(heatedBed.getTemperature()); // TODO: bed temp needed
+                                talkToHost.setBTemp(heatedBed.getTemperature());
 #endif
-
 				break;
 
 			//turn fan on
@@ -626,22 +578,13 @@ void process_string(char instruction[], int size)
                         // Starting a new print, reset the gc.LastLineNrRecieved counter
 			case 110:
 				if (gc.seen & GCODE_N)
-				  {
 			          gc.LastLineNrRecieved = gc.N;
- 				  if(SendDebug & DEBUG_INFO)
-                                    Serial.println("DEBUG:LineNr set");
-				  }
 				break;
 			case 111:
 				SendDebug = gc.S;
 				break;
 			case 112:	// STOP!
-                               {
-                                 int a=50;
-                                 while(a--)
-                                  {blink(); delay(50);}
-                               }
-				cancelAndClearQueue();
+				shutdown();
 				break;
 
 // If there's an S field, use that to set the PWM, otherwise use the pot.
@@ -657,14 +600,7 @@ void process_string(char instruction[], int size)
 
 			//custom code for returning current coordinates
 			case 114:
-				Serial.print("C: X");
-                                Serial.print(where_i_am.x);
-                                Serial.print(" Y");
-                                Serial.print(where_i_am.y);
-                                Serial.print(" Z");
-                                Serial.print(where_i_am.z);
-                                Serial.print(" E");
-                                Serial.println(where_i_am.e);
+                                talkToHost.setCoords(where_i_am);
 				break;
 
 
@@ -691,8 +627,7 @@ void process_string(char instruction[], int size)
 				{
 #if MOTHERBOARD == 2
 					ex[0]->setBedTemperature((int)gc.S);
-#endif
-#if MOTHERBOARD == 3
+#else
 					heatedBed.setTemperature((int)gc.S);
 #endif				
                                 }
@@ -706,11 +641,8 @@ void process_string(char instruction[], int size)
 
 			default:
 				if(SendDebug & DEBUG_ERRORS)
-                                {
-                                  Serial.print("Huh? M");
-				  Serial.println(gc.M, DEC);
-                                  FlushSerialRequestResend();
-                                }
+                                  sprintf(talkToHost.string(), "Dud M code: M%d", gc.M);
+                                talkToHost.setResend(gc.LastLineNrRecieved+1);
 		}
 
                 
@@ -793,6 +725,7 @@ void setupGcodeProcessor()
   gc.LastLineNrRecieved = -1;
 }
 
+/*
 void FlushSerialRequestResend()
 {
   Serial.flush();
@@ -800,4 +733,4 @@ void FlushSerialRequestResend()
   ltoa(gc.LastLineNrRecieved+1, seBuffer+7, 10);
   Serial.println(seBuffer);
 }
-
+*/

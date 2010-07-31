@@ -74,12 +74,12 @@ void extruder::waitForTemperature()
   }
 }
 
-// TODO: Should use debugstring[]
+// This is a fatal error - something is wrong with the heater.
 
 void extruder::temperatureError()
 {
-  Serial.print("E: ");
-  Serial.println(getTemperature());  
+  sprintf(talkToHost.string(), "Extruder temperature not rising - hard fault.");
+  talkToHost.setFatal();
 }
 
 /***************************************************************************************************************************

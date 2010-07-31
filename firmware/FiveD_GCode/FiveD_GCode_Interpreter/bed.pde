@@ -121,12 +121,12 @@ void bed::waitForTemperature()
   }
 }
 
-// TODO: Should use debugstring[]
+// This is a fatal error - something is wrong with the heater.
 
 void bed::temperatureError()
 {
-  Serial.print("E: ");
-  Serial.println(getTemperature());  
+  sprintf(talkToHost.string(), "Bed temperature not rising - hard fault.");
+  talkToHost.setFatal();
 }
 
 #endif

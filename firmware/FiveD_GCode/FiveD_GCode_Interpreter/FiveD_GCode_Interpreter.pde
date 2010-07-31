@@ -4,6 +4,7 @@
 #include "WProgram.h"
 #include "vectors.h"
 #include "configuration.h"
+#include "hostcom.h"
 #include "intercom.h"
 #include "pins.h"
 #include "Temperature.h"
@@ -42,10 +43,6 @@ http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 
 extruder* ex[EXTRUDER_COUNT];
 byte extruder_in_use = 0;
-
-// Text placed in this (terminated with 0) will be transmitted back to the host
-// along with the next G Code acknowledgement.
-char debugstring[COMMAND_SIZE];
 
 
 // Old Mothers...
@@ -98,6 +95,8 @@ static bed heatedBed(BED_HEATER_PIN, BED_TEMPERATURE_PIN);
 
 #endif
 
+hostcom talkToHost;
+
 // Each entry in the buffer is an instance of cartesian_dda.
 
 cartesian_dda* cdda[BUFFER_SIZE];
@@ -144,7 +143,6 @@ void setup()
   setupTimerInterrupt();
   interruptBlink = 0;
   pinMode(DEBUG_PIN, OUTPUT);
-  debugstring[0] = 0;
   led = false;
   
   setupGcodeProcessor();
@@ -170,9 +168,7 @@ void setup()
   
   init_process_string();
   
-
-  Serial.begin(HOST_BAUD);
-  Serial.println("start");
+  talkToHost.start();
   
 #if MOTHERBOARD == 2 
     pinMode(PS_ON_PIN, OUTPUT);  // add to run G3 as built by makerbot
@@ -192,17 +188,14 @@ void setup()
 
 void shutdown()
 {
-  // No more stepping
+  // No more stepping or other interrupts
   
-  disableTimerInterrupt();
+  cli();
   
   // Delete everything in the ring buffer
   
   cancelAndClearQueue();
   
-  // LED off
-  
-  digitalWrite(DEBUG_PIN, 0);
 
   // Motors off
   
@@ -216,6 +209,20 @@ void shutdown()
   
   for(byte i = 0; i < EXTRUDER_COUNT; i++)
     ex[i]->shutdown();
+
+// If we run the bed, turn it off.
+
+#if MOTHERBOARD != 2
+  heatedBed.shutdown();
+#endif
+
+//  int a=50;
+//  while(a--) {blink(); delay(50);}
+  
+  // LED off
+  
+  digitalWrite(DEBUG_PIN, 0);
+  
   
   // Till the end of time...
   

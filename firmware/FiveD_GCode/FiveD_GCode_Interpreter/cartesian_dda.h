@@ -131,21 +131,18 @@ inline bool cartesian_dda::active()
 inline void cartesian_dda::do_x_step()
 {
 	digitalWrite(X_STEP_PIN, HIGH);
-	//delayMicrosecondsInterruptible(5);
 	digitalWrite(X_STEP_PIN, LOW);
 }
 
 inline void cartesian_dda::do_y_step()
 {
 	digitalWrite(Y_STEP_PIN, HIGH);
-	//delayMicrosecondsInterruptible(5);
 	digitalWrite(Y_STEP_PIN, LOW);
 }
 
 inline void cartesian_dda::do_z_step()
 {
 	digitalWrite(Z_STEP_PIN, HIGH);
-	//delayMicrosecondsInterruptible(5);
 	digitalWrite(Z_STEP_PIN, LOW);
 }
 
@@ -176,7 +173,6 @@ inline bool cartesian_dda::xCanStep(long current, long target, bool dir)
 //stop us if we're home and still going lower
 
 #if ENDSTOPS_MIN_ENABLED == 1
-//#if X_MIN_PIN >= 0
 #if X_ENDSTOP_INVERTING
 	if(!dir && !digitalRead(X_MIN_PIN) )
 		return false;
@@ -184,13 +180,11 @@ inline bool cartesian_dda::xCanStep(long current, long target, bool dir)
 	if(!dir && digitalRead(X_MIN_PIN) )
 		return false;
 #endif
-//#endif
 #endif
 
 //stop us if we're at max and still going higher
 
 #if ENDSTOPS_MAX_ENABLED == 1
-//#if X_MAX_PIN >= 0
 #if X_ENDSTOP_INVERTING
 	if(dir && !digitalRead(X_MAX_PIN) )
 		return false;
@@ -198,7 +192,6 @@ inline bool cartesian_dda::xCanStep(long current, long target, bool dir)
 	if(!dir && digitalRead(X_MAX_PIN) )
 		return false;
 #endif
-//#endif
 #endif
 
 // All OK - we can step
@@ -216,7 +209,6 @@ inline bool cartesian_dda::yCanStep(long current, long target, bool dir)
 //stop us if we're home and still going lower
 
 #if ENDSTOPS_MIN_ENABLED == 1
-//#if Y_MIN_PIN >= 0
 #if Y_ENDSTOP_INVERTING
 	if(!dir && !digitalRead(Y_MIN_PIN) )
 		return false;
@@ -224,13 +216,11 @@ inline bool cartesian_dda::yCanStep(long current, long target, bool dir)
 	if(!dir && digitalRead(Y_MIN_PIN) )
 		return false;
 #endif
-//#endif
 #endif
 
 //stop us if we're at max and still going higher
 
 #if ENDSTOPS_MAX_ENABLED == 1
-//#if Y_MAX_PIN >= 0
 #if Y_ENDSTOP_INVERTING
 	if(dir && !digitalRead(Y_MAX_PIN) )
 		return false;
@@ -238,7 +228,6 @@ inline bool cartesian_dda::yCanStep(long current, long target, bool dir)
 	if(!dir && digitalRead(Y_MAX_PIN) )
 		return false;
 #endif
-//#endif
 #endif
 
 // All OK - we can step
@@ -256,7 +245,6 @@ inline bool cartesian_dda::zCanStep(long current, long target, bool dir)
 //stop us if we're home and still going lower
 
 #if ENDSTOPS_MIN_ENABLED == 1
-//#if Z_MIN_PIN >= 0
 #if Z_ENDSTOP_INVERTING
 	if(!dir && !digitalRead(Z_MIN_PIN) )
 		return false;
@@ -264,13 +252,11 @@ inline bool cartesian_dda::zCanStep(long current, long target, bool dir)
 	if(!dir && digitalRead(Z_MIN_PIN) )
 		return false;
 #endif
-//#endif
 #endif
 
 //stop us if we're at max and still going higher
 
 #if ENDSTOPS_MAX_ENABLED == 1
-//#if Z_MAX_PIN >= 0
 #if Z_ENDSTOP_INVERTING
 	if(dir && !digitalRead(Z_MAX_PIN) )
 		return false;
@@ -278,7 +264,6 @@ inline bool cartesian_dda::zCanStep(long current, long target, bool dir)
 	if(!dir && digitalRead(Z_MAX_PIN) )
 		return false;
 #endif
-//#endif
 #endif
 
 // All OK - we can step
