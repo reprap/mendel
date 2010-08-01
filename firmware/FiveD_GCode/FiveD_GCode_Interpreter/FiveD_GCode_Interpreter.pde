@@ -95,7 +95,7 @@ static bed heatedBed(BED_HEATER_PIN, BED_TEMPERATURE_PIN);
 
 #endif
 
-hostcom talkToHost;
+static hostcom talkToHost;
 
 // Each entry in the buffer is an instance of cartesian_dda.
 

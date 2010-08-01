@@ -220,7 +220,6 @@ void get_and_do_command()
 	{
                 // Terminate string
                 cmdbuffer[serial_count] = 0;
-                
                  if(SendDebug & DEBUG_ECHO)
                    sprintf(talkToHost.string(), "Echo: %s", cmdbuffer);
                    
