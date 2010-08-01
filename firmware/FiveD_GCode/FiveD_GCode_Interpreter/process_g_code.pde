@@ -187,9 +187,9 @@ inline void init_process_string()
 void get_and_do_command()
 {         
         c = ' ';
-        while(Serial.available() && c != '\n')
+        while(talkToHost.gotData() && c != '\n')
 	{
-		c = Serial.read();
+		c = talkToHost.get();
                 blink();
                 if(c == '\r')
                   c = '\n';
@@ -220,7 +220,8 @@ void get_and_do_command()
 	{
                 // Terminate string
                 cmdbuffer[serial_count] = 0;
-                 if(SendDebug & DEBUG_ECHO)
+                
+                if(SendDebug & DEBUG_ECHO)
                    sprintf(talkToHost.string(), "Echo: %s", cmdbuffer);
                    
 		//process our command!
@@ -233,14 +234,6 @@ void get_and_do_command()
                 
                 talkToHost.sendMessage(SendDebug & DEBUG_INFO);
                 
- /*               if(debugstring[0] != 0 && (SendDebug & DEBUG_INFO))
-                {
-                  Serial.print("ok ");
-                  Serial.println(debugstring);
-                  debugstring[0] = 0;
-                } else
-                  Serial.println("ok");
-*/
 	}
 }
 

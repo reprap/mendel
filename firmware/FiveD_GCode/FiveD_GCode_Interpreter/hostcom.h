@@ -1,8 +1,9 @@
 #ifndef HOSTCOM_H
 #define HOSTCOM_H
 /*
- * Class to handle sending messages back to the host
- * NOWHERE ELSE in this program should anything send to Serial.print
+ * Class to handle sending messages from and back to the host.
+ * NOWHERE ELSE in this program should anything send to Serial.print()
+ * or get anything from Serial.read().
  */
 
 // Can't get lower than absolute zero...
@@ -21,13 +22,24 @@ public:
   void setCoords(const FloatPoint& where);
   void setResend(long ln);
   void setFatal();
-  void sendMessage(bool noText);
+  void sendMessage(bool doMessage);
   void start();
+  
+// Wrappers for the comms interface
+
+  void putInit();
+  void put(char* s);
+  void put(const float& f);
+  void put(const long& l);
+  void put(int i);
+  void putEnd();
+  byte gotData();
+  char get();
   
 private:
   void reset();
   void sendtext(bool noText);
-  char message[COMMAND_SIZE];
+  char message[RESPONSE_SIZE];
   int etemp;
   int btemp;
   float x;
@@ -45,6 +57,17 @@ inline hostcom::hostcom()
   reset();
 }
 
+// Wrappers for the comms interface
+
+inline void hostcom::putInit() {  Serial.begin(HOST_BAUD); }
+inline void hostcom::put(char* s) { Serial.print(s); }
+inline void hostcom::put(const float& f) { Serial.print(f); }
+inline void hostcom::put(const long& l) { Serial.print(l); }
+inline void hostcom::put(int i) { Serial.print(i); }
+inline void hostcom::putEnd() { Serial.println(); }
+inline byte hostcom::gotData() { return Serial.available(); }
+inline char hostcom::get() { return Serial.read(); }
+
 inline void hostcom::reset()
 {
   etemp = NO_TEMP;
@@ -57,8 +80,9 @@ inline void hostcom::reset()
 
 inline void hostcom::start()
 {
-  Serial.begin(HOST_BAUD);
-  Serial.println("start");  
+  putInit();
+  put("start");
+  putEnd();  
 }
 
 inline char* hostcom::string()
@@ -95,66 +119,65 @@ inline void hostcom::setFatal()
   fatal = true;
 }
 
-inline void hostcom::sendtext(bool noText)
+inline void hostcom::sendtext(bool doMessage)
 {
-  if(noText)
+  if(!doMessage)
     return;
   if(!message[0])
     return;
-  Serial.print(" ");
-  Serial.print(message);
+  put(" ");
+  put(message);
 }
 
-inline void hostcom::sendMessage(bool noText)
+inline void hostcom::sendMessage(bool doMessage)
 {
   if(fatal)
   {
-    Serial.print("!!");
-    sendtext(false);
-    Serial.println();
+    put("!!");
+    sendtext(true);
+    putEnd();
     shutdown();
     return; // Technically redundant - shutdown never returns.
   }
   
   if(resend < 0)
-    Serial.print("ok");
+    put("ok");
   else
   {
-    Serial.print("rs ");
-    Serial.print(resend);
+    put("rs ");
+    put(resend);
   }
     
   if(etemp > NO_TEMP)
   {
-    Serial.print(" T:");
-    Serial.print(etemp);
+    put(" T:");
+    put(etemp);
   }
   
   if(btemp > NO_TEMP)
   {
-    Serial.print(" B:");
-    Serial.print(btemp);
+    put(" B:");
+    put(btemp);
   }
   
   if(sendCoordinates)
   {				
-    Serial.print(" C: X:");
-    Serial.print(x);
-    Serial.print(" Y:");
-    Serial.print(y);
-    Serial.print(" Z:");
-    Serial.print(z);
-    Serial.print(" E:");
-    Serial.print(e);
+    put(" C: X:");
+    put(x);
+    put(" Y:");
+    put(y);
+    put(" Z:");
+    put(z);
+    put(" E:");
+    put(e);
   }
   
-  sendtext(noText);
+  sendtext(doMessage);
   
-  Serial.println();
+  putEnd();
   
   reset(); 
 }
 
-//extern hostcom talkToHost;
 
 #endif

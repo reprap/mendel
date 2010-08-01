@@ -267,6 +267,10 @@
 
 #define COMMAND_SIZE 128 // *RO
 
+// Our response string length
+
+#define RESPONSE_SIZE 256 // *RO
+
 // The size of the movement buffer
 
 #define BUFFER_SIZE 4 // *RO
@@ -285,7 +289,6 @@
 // You probably only want to edit things below this line if you really really
 // know what you are doing...
 
-extern char debugstring[];
 
 void delayMicrosecondsInterruptible(unsigned int us);
 

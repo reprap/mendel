@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdio.h>
 #include <HardwareSerial.h>
 #include <avr/pgmspace.h>
 #include "WProgram.h"
@@ -118,9 +119,21 @@ FloatPoint where_i_am;
 
 // Our interrupt function
 
+/*
+This has an internal flag (nonest) to prevent its being interrupted by another timer interrupt.
+It re-enables interrupts internally (not something that one would normally do with an ISR).
+This allows USART interrupts to be serviced while this ISR is also live, and so prevents 
+communications errors.
+*/
+
+volatile bool nonest;
+
 ISR(TIMER1_COMPA_vect)
 {
-  //disableTimerInterrupt();
+  if(nonest)
+    return;
+  nonest = true;
+  sei();
   interruptBlink++;
   if(interruptBlink == 0x280)
   {
@@ -133,12 +146,12 @@ ISR(TIMER1_COMPA_vect)
       cdda[tail]->dda_step();
   else
       dQMove();
- 
-  //enableTimerInterrupt();
+  nonest = false;
 }
 
 void setup()
 {
+  nonest = false;
   disableTimerInterrupt();
   setupTimerInterrupt();
   interruptBlink = 0;
@@ -246,6 +259,7 @@ void manage()
 
 void loop()
 {
+  nonest = false;
    manage();
    get_and_do_command(); 
 #if MOTHERBOARD == 2

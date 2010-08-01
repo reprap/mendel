@@ -4,7 +4,7 @@
 #include "extruder.h"
 #include "vectors.h"
 #include "cartesian_dda.h"
-#include <stdio.h>
+
 
 
 cartesian_dda::cartesian_dda()
