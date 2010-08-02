@@ -17,3 +17,6 @@ xlr-power-bracket
 
 This part allows you to mount an XLR power connector onto Mendel when you don't have the standard stepper-motor controller carrier board in the machine (for example, if you are using the Pololu electronics: http://reprap.org/wiki/Pololu_Electronics).
 
+purge-tray
+
+This is an alternative to the laser-cut projection that catches the purge plastic from the extruder.  It can be made in the RepRap machine, and has indentations to catch the waste.
