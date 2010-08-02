@@ -32,9 +32,8 @@
 #define EXTRUDER_COUNT 2
 
 //*********************************************************************************************
-
 // These settings are mainly for Darwin
-
+//*********************************************************************************************
 #if MOTHERBOARD == 1
 
 // Temperature measurement
@@ -89,8 +88,8 @@
 #endif
 
 //**********************************************************************************************
-
 // These settings are mainly for a standard Mendel
+//*********************************************************************************************
 
 #if MOTHERBOARD == 2
 
@@ -143,9 +142,9 @@
 #endif
 
 //**********************************************************************************************
-
 // These settings are mainly for a Mendel with an Arduino Mega controller and Pololu stepper drivers
 // See http://reprap.org/wiki/Pololu_Electronics
+//*********************************************************************************************
 
 #if MOTHERBOARD == 3
 
@@ -200,6 +199,8 @@
 #endif
 
 //**********************************************************************************************
+//  All other Settings not specific to the motherboard type: 
+//*********************************************************************************************
 
 // The speed at which to talk with the host computer; default is 19200
 
