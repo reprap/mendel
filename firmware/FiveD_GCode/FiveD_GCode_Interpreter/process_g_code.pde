@@ -580,7 +580,7 @@ void process_string(char instruction[], int size)
 				break;
 
 // If there's an S field, use that to set the PWM, otherwise use the pot.
-                       case 108:
+                       case 108: // Depricated
                        case 113:
                                 #if MOTHERBOARD == 2
                                  if (gc.seen & GCODE_S)
@@ -717,12 +717,3 @@ void setupGcodeProcessor()
   gc.LastLineNrRecieved = -1;
 }
 
-/*
-void FlushSerialRequestResend()
-{
-  Serial.flush();
-  strcpy(seBuffer, "Resend:");
-  ltoa(gc.LastLineNrRecieved+1, seBuffer+7, 10);
-  Serial.println(seBuffer);
-}
-*/
