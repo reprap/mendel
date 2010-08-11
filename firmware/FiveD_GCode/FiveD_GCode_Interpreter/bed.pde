@@ -26,51 +26,13 @@ bed::bed(byte heat, byte temp)
   
   analogWrite(heater_pin, 0);
 
-  //these our the default values for the extruder.
 
-  targetTemperature = 0;
-
-  setTemperature(targetTemperature);
+  setTemperature(0);
 }
 
 void bed::controlTemperature()
 {   
-  bedPID->pidCalculation(targetTemperature);
-}
-
-
-
-void bed::slowManage()
-{
-  manageCount = 0;  
-
-  controlTemperature();
-}
-
-void bed::manage()
-{
-  manageCount++;
-  if(manageCount > SLOW_CLOCK)
-    slowManage();   
-}
-
-// Stop everything
-
-void bed::shutdown()
-{
-  setTemperature(0);
-  bedPID->shutdown();
-}
-
-void bed::setTemperature(int tp)
-{
-  bedPID->reset();
-  targetTemperature = tp;
-}
-
-int bed::getTemperature()
-{
-  return bedPID->temperature();  
+  bedPID->pidCalculation();
 }
 
 
@@ -89,7 +51,7 @@ void bed::waitForTemperature()
     if(count > 5)
     {
       newT = newT/5;
-      if(newT >= targetTemperature - HALF_DEAD_ZONE)
+      if(newT >= bedPID->getTarget() - HALF_DEAD_ZONE)
       {
         warming = false;
         if(seconds > WAIT_AT_TEMPERATURE)

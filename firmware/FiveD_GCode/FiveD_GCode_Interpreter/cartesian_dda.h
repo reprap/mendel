@@ -103,6 +103,10 @@ public:
   
   bool active();
   
+  // Are we extruding at the moment?
+  
+  bool extruding();
+  
   // True for mm; false for inches
   
   void set_units(bool using_mm);
@@ -127,6 +131,12 @@ inline bool cartesian_dda::active()
 {
   return live;
 }
+
+inline bool cartesian_dda::extruding()
+{
+  return live && (current_steps.e != target_steps.e);
+}
+
 
 inline void cartesian_dda::do_x_step()
 {

@@ -39,6 +39,7 @@ public:
    void setCooler(byte e_speed);
    void setTemperature(int temp);
    int getTemperature();
+   int getTarget();
    void manage();
 // Interrupt setup and handling functions for stepper-driven extruders
    
@@ -55,13 +56,15 @@ private:
 
 //these our the default values for the extruder.
     byte e_speed;
-    int targetTemperature;
+   // int targetTemperature;
     int max_celsius;
     byte heater_low;
     byte heater_high;
     byte heater_current;
     int extrude_step_count;
     float sPerMM;
+    
+    int targetTemperature;
 
 // These are used for temperature control    
     byte count ;
@@ -85,6 +88,11 @@ private:
      int sampleTemperature();
    
 };
+
+inline int extruder::getTarget()
+{
+  return targetTemperature;
+}
 
 inline void extruder::enableStep()
 {
@@ -163,6 +171,7 @@ public:
    int getBedTemperature();
    void setBedTemperature(int temp);
    int getTemperature();
+   int getTarget();
    void manage();
    void sStep();
    void enableStep();
@@ -248,6 +257,11 @@ inline  void extruder::setTemperature(int temp)
    targetTemperature = temp;
    buildNumberCommand(SET_T, temp);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer); 
+}
+
+inline int extruder::getTarget()
+{
+   return targetTemperature;
 }
 
 inline  int extruder::getTemperature()
@@ -373,6 +387,7 @@ public:
    void setCooler(byte e_speed);
    void setTemperature(int temp);
    int getTemperature();
+   int getTarget();
    void slowManage();
    void manage();
    void sStep();
@@ -385,7 +400,7 @@ public:
  
 private:
 
-   int targetTemperature;
+//   int targetTemperature;
    int count;
    int oldT, newT;
    float sPerMM;
@@ -414,6 +429,78 @@ inline void extruder::sStep()
 {
 	digitalWrite(motor_step_pin, HIGH);
 	digitalWrite(motor_step_pin, LOW);  
+}
+
+inline void extruder::controlTemperature()
+{   
+  extruderPID->pidCalculation();
+}
+
+inline void extruder::slowManage()
+{
+  manageCount = 0;  
+
+  controlTemperature();
+}
+
+inline void extruder::manage()
+{
+  
+#ifdef PASTE_EXTRUDER
+  valveMonitor();
+#endif
+
+  manageCount++;
+  if(manageCount > SLOW_CLOCK)
+    slowManage();   
+}
+
+inline void extruder::setDirection(bool direction)
+{
+  digitalWrite(motor_dir_pin, direction);  
+}
+
+inline void extruder::setCooler(byte e_speed)
+{
+  //analogWrite(fan_pin, e_speed);   
+}
+
+inline void extruder::setTemperature(int tp)
+{
+  extruderPID->setTarget(tp);
+}
+
+inline int extruder::getTemperature()
+{
+  return extruderPID->temperature();  
+}
+
+inline int extruder::getTarget()
+{
+  return extruderPID->getTarget();  
+}
+
+
+
+inline void extruder::enableStep()
+{
+    digitalWrite(motor_en_pin, ENABLE_ON);
+}
+
+inline void extruder::disableStep()
+{
+#if DISABLE_E
+    digitalWrite(motor_en_pin, !ENABLE_ON);
+#endif
+}
+
+
+inline void extruder::valveSet(bool closed, int dTime)
+{
+#ifdef PASTE_EXTRUDER
+  requiredValveState = closed;
+  kickStartValve();
+#endif
 }
 
 

@@ -29,11 +29,12 @@
 
 // The number of real extruders in this machine
 
-#define EXTRUDER_COUNT 2
+#define EXTRUDER_COUNT 1
 
 //*********************************************************************************************
+
 // These settings are mainly for Darwin
-//*********************************************************************************************
+
 #if MOTHERBOARD == 1
 
 // Temperature measurement
@@ -88,8 +89,8 @@
 #endif
 
 //**********************************************************************************************
+
 // These settings are mainly for a standard Mendel
-//*********************************************************************************************
 
 #if MOTHERBOARD == 2
 
@@ -142,9 +143,9 @@
 #endif
 
 //**********************************************************************************************
+
 // These settings are mainly for a Mendel with an Arduino Mega controller and Pololu stepper drivers
 // See http://reprap.org/wiki/Pololu_Electronics
-//*********************************************************************************************
 
 #if MOTHERBOARD == 3
 
@@ -199,8 +200,6 @@
 #endif
 
 //**********************************************************************************************
-//  All other Settings not specific to the motherboard type: 
-//*********************************************************************************************
 
 // The speed at which to talk with the host computer; default is 19200
 
@@ -257,12 +256,20 @@
 
 #define WAIT_AT_TEMPERATURE 10
 
-// PID gains.  These are about right for a brass extruder about 8 mm 
-// in diameter and 30 mm long heated by a 6 ohm coil with a 12v supply.
+// PID gains.  E_ = extruder, B_ = bed.  The Es are about right for a brass extruder about 8 mm 
+// in diameter and 30 mm long heated by a 6 ohm coil with a 12v supply.  The B_ values are OK
+// for the bed described here:  http://reprap.org/wiki/Mendel_heated_bed
+// Extruding increase biases the input to the extruder heater when the extruder
+// is running as it requires more power.
 
-#define TEMP_PID_PGAIN 2
-#define TEMP_PID_IGAIN 0.07
-#define TEMP_PID_DGAIN 1
+#define E_TEMP_PID_PGAIN 2
+#define E_TEMP_PID_IGAIN 0.15
+#define E_TEMP_PID_DGAIN 0.5
+#define EXTRUDING_INCREASE 7
+
+#define B_TEMP_PID_PGAIN 2
+#define B_TEMP_PID_IGAIN 0.07
+#define B_TEMP_PID_DGAIN 1
 
 //our command string length
 

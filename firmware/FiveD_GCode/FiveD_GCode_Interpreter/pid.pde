@@ -10,24 +10,33 @@ PIDcontrol::PIDcontrol(byte hp, byte tp, bool b)
    heat_pin = hp;
    temp_pin = tp;
    doingBed = b;
-   pGain = TEMP_PID_PGAIN;
-   iGain = TEMP_PID_IGAIN;
-   dGain = TEMP_PID_DGAIN;
+   if(doingBed)
+   {
+     pGain = B_TEMP_PID_PGAIN;
+     iGain = B_TEMP_PID_IGAIN;
+     dGain = B_TEMP_PID_DGAIN;
+   } else
+   {
+     pGain = E_TEMP_PID_PGAIN;
+     iGain = E_TEMP_PID_IGAIN;
+     dGain = E_TEMP_PID_DGAIN;
+   }   
    currentTemperature = 0;
-   reset();
+   setTarget(0);
    pinMode(heat_pin, OUTPUT);
    pinMode(temp_pin, INPUT); 
 }
 
 /*
- Reset the PID to, for example, remove accumulated integral error from
+ Set the target temperature.  This also
+ resets the PID to, for example, remove accumulated integral error from
  a long period when the heater was off and the requested temperature was 0 (which it
- won't go down to, even with the heater off, so the integral error grows).  Call this 
- whenever you change the target value.
+ won't go down to, even with the heater off, so the integral error grows).  
 */
 
-void PIDcontrol::reset()
+void PIDcontrol::setTarget(int t)
 {
+   targetTemperature = t;
    previousTime = millis();
    previousError = 0;
    integral = 0;  
@@ -115,7 +124,7 @@ void PIDcontrol::internalTemperature(short table[][2])
 }
 
 
-void PIDcontrol::pidCalculation(int target)
+void PIDcontrol::pidCalculation()
 {
   if(doingBed)
     internalTemperature(bedtemptable);
@@ -127,18 +136,17 @@ void PIDcontrol::pidCalculation(int target)
   if (dt <= 0) // Don't do it when millis() has rolled over
     return;
     
-  float error = (float)(target - currentTemperature);
+  float error = (float)(targetTemperature - currentTemperature);
   integral += error*dt;
   float derivative = (error - previousError)/dt;
   previousError = error;
   int output = (int)(error*pGain + integral*iGain + derivative*dGain);
+  if(!doingBed && cdda[tail]->extruding())
+    output += EXTRUDING_INCREASE;
   output = constrain(output, 0, 255);
   analogWrite(heat_pin, output);
 }
 
-void PIDcontrol::shutdown()
-{
-  analogWrite(heat_pin, 0);
-}
+
 
 #endif

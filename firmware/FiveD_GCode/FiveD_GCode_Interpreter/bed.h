@@ -22,7 +22,7 @@ public:
  
 private:
 
-   int targetTemperature;
+//   int targetTemperature;
    int count;
    int oldT, newT;
    long manageCount;
@@ -37,6 +37,39 @@ private:
    byte heater_pin,  temp_pin;
  
 };
+
+inline void bed::slowManage()
+{
+  manageCount = 0;  
+
+  controlTemperature();
+}
+
+inline void bed::manage()
+{
+  manageCount++;
+  if(manageCount > SLOW_CLOCK)
+    slowManage();   
+}
+
+// Stop everything
+
+inline void bed::shutdown()
+{
+  setTemperature(0);
+  bedPID->shutdown();
+}
+
+inline void bed::setTemperature(int tp)
+{
+  bedPID->setTarget(tp);
+}
+
+inline int bed::getTemperature()
+{
+  return bedPID->temperature();  
+}
+
 
 #endif
 #endif

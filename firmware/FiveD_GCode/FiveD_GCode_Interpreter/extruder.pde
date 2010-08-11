@@ -42,7 +42,7 @@ void extruder::waitForTemperature()
     if(count > 5)
     {
       newT = newT/5;
-      if(newT >= targetTemperature - HALF_DEAD_ZONE)
+      if(newT >= getTarget() - HALF_DEAD_ZONE)
       {
         warming = false;
         if(seconds > WAIT_AT_TEMPERATURE)
@@ -310,11 +310,7 @@ extruder::extruder(byte stp, byte dir, byte en, byte heat, byte temp, float spm)
   
   analogWrite(heater_pin, 0);
 
-  //these our the default values for the extruder.
-
-  targetTemperature = 0;
-
-  setTemperature(targetTemperature);
+  setTemperature(0);
   
 #ifdef PASTE_EXTRUDER
   valve_dir_pin = vd_pin;
@@ -326,33 +322,6 @@ extruder::extruder(byte stp, byte dir, byte en, byte heat, byte temp, float spm)
   valve_open = false;
 #endif
 }
-
-void extruder::controlTemperature()
-{   
-  extruderPID->pidCalculation(targetTemperature);
-}
-
-
-
-void extruder::slowManage()
-{
-  manageCount = 0;  
-
-  controlTemperature();
-}
-
-void extruder::manage()
-{
-  
-#ifdef PASTE_EXTRUDER
-  valveMonitor();
-#endif
-
-  manageCount++;
-  if(manageCount > SLOW_CLOCK)
-    slowManage();   
-}
-
 
 
 // Stop everything
@@ -370,51 +339,6 @@ void extruder::shutdown()
 #endif
 }
 
-
-
-void extruder::setDirection(bool direction)
-{
-  digitalWrite(motor_dir_pin, direction);  
-}
-
-void extruder::setCooler(byte e_speed)
-{
-  //analogWrite(fan_pin, e_speed);   
-}
-
-void extruder::setTemperature(int tp)
-{
-  extruderPID->reset();
-  targetTemperature = tp;
-}
-
-int extruder::getTemperature()
-{
-  return extruderPID->temperature();  
-}
-
-
-
-void extruder::enableStep()
-{
-    digitalWrite(motor_en_pin, ENABLE_ON);
-}
-
-void extruder::disableStep()
-{
-#if DISABLE_E
-    digitalWrite(motor_en_pin, !ENABLE_ON);
-#endif
-}
-
-
-void extruder::valveSet(bool closed, int dTime)
-{
-#ifdef PASTE_EXTRUDER
-  requiredValveState = closed;
-  kickStartValve();
-#endif
-}
 
 #ifdef PASTE_EXTRUDER
 

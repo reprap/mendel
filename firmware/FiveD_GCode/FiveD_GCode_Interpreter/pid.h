@@ -20,15 +20,16 @@ private:
   float iGain;
   float dGain;
   byte heat_pin, temp_pin;
-  int currentTemperature;
+  int currentTemperature, targetTemperature;
  
   void internalTemperature(short table[][2]); 
   
 public:
 
   PIDcontrol(byte hp, byte tp, bool b);
-  void reset();
-  void pidCalculation(int target);
+  void setTarget(int t);
+  int getTarget();
+  void pidCalculation();
   void shutdown();
   int temperature();
   
@@ -37,6 +38,16 @@ public:
 inline int PIDcontrol::temperature() 
 { 
   return currentTemperature; 
+}
+
+inline int PIDcontrol::getTarget() 
+{ 
+  return targetTemperature; 
+}
+
+inline void PIDcontrol::shutdown()
+{
+  analogWrite(heat_pin, 0);
 }
 
 #endif
