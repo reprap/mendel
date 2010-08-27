@@ -4,6 +4,10 @@ frame-vertex-with-foot-4off
 
 This hold the machine higher off the ground giving greater clearance fo moving parts underneath.  This is an alternative to gluing rubber feet on the machine (note - such feet may give better vibration isolation).  Replace four of the six frame vertices with these.
 
+frame-vertex_with_simple_foot_4off.stl
+
+A simple alternative to the above based on the orginal so that the hole sizes are the same.
+
 
 set-screw-drive-pulley_3off
 
