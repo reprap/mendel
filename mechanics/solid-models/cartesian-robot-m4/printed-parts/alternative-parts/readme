@@ -8,10 +8,13 @@ frame-vertex_with_simple_foot_4off.stl
 
 A simple alternative to the above based on the orginal so that the hole sizes are the same.
 
+purge-tray
+
+This is an alternative to the laser-cut projection that catches the purge plastic from the extruder.  It can be made in the RepRap machine, and has indentations to catch the waste.
 
 set-screw-drive-pulley_3off
 
-These Mendel pulleys use an M3 grub screw and a captive nut. The advantage over the original is that you only need one small flat on the motor shaft, rather than two full length ones that have to be filed to exactly the right size.  Replace drive-pulley_3off with three of these.
+These Mendel pulleys use an M3 grub screw and a captive nut. The advantage over the original is that you only need one small flat on the motor shaft, rather than two full length ones that have to be filed to exactly the right size.  Replace drive-pulley_3off with three of these.  There are several different pulley designs in the AoI file.  The two main ones are set-screw-drive-pulley_4_6-5_9_7_3off.stl and set-screw-drive-pulley_7_9-5_13_7-3off.stl (the numbers are the parameters into the AoI cog function to generate the profiles).  The first has 9 teeth, the second has 13.  If your electronics can't do microstepping, use the first; this will give you the resolution you need.  If you can do microstepping, use the second; this will give a bigger pulley diameter, putting less strain on the toothed belt.  See the file configuration.h in the firmware for the values to set for steps/mm of movement for each pulley.
 
 xaxis-motorbracket_1off
 
@@ -21,6 +24,3 @@ xlr-power-bracket
 
 This part allows you to mount an XLR power connector onto Mendel when you don't have the standard stepper-motor controller carrier board in the machine (for example, if you are using the Pololu electronics: http://reprap.org/wiki/Pololu_Electronics).
 
-purge-tray
-
-This is an alternative to the laser-cut projection that catches the purge plastic from the extruder.  It can be made in the RepRap machine, and has indentations to catch the waste.
